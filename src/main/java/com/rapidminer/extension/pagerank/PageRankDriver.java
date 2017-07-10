@@ -20,7 +20,7 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
 import com.rapidminer.example.ExampleSet;
-import com.rapidminer.extension.utilities.Helper;
+import com.rapidminer.extension.utilities.HadoopHelper;
 import com.rapidminer.extension.utilities.ReadFileHadoopLocalCallable;
 import com.rapidminer.gui.tools.syntax.InputHandler.insert_char;
 
@@ -30,8 +30,8 @@ public class PageRankDriver extends Configured implements Tool {
 	public static String LINKS_SEPARATOR = "|";
 	private static NumberFormat nf = new DecimalFormat("00");
 	public static final String OUTPUT = "D:/";
-	public static final float DAMPING = 0.85f;
-	public static final int INTERATION = 1;
+	public static Double DAMPING = 0.85d;
+	public static int INTERATIONS = 1;
 	public static void main(String[] args) throws Exception {
 		System.exit(ToolRunner.run(new Configuration(), new PageRankDriver(), args));
 
@@ -53,7 +53,7 @@ public class PageRankDriver extends Configured implements Tool {
 
 		String lastResultPath = null;
 
-		for (int runs = 0; runs < 1; runs++) {
+		for (int runs = 0; runs < INTERATIONS; runs++) {
 			//String inPath = "/pageRank/ranking/iter" + nf.format(runs);
 			String inPath = "D:/dblp.txt";
 			lastResultPath = OUTPUT+"/pageRank/ranking/iter" + nf.format(runs + 1);
@@ -82,7 +82,7 @@ public class PageRankDriver extends Configured implements Tool {
 		// job.setCombinerClass(DBLPCalculateReducer.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
-		Helper.deleteFolderHadoopLocal(outputPath);
+		HadoopHelper.deleteFolderHadoopLocal(outputPath);
 		FileInputFormat.addInputPath(job, new Path(inputPath));
 		FileOutputFormat.setOutputPath(job, new Path(outputPath));
 
@@ -100,7 +100,7 @@ public class PageRankDriver extends Configured implements Tool {
 		rankOrdering.setOutputValueClass(Text.class);
 
 		rankOrdering.setMapperClass(RankingMapper.class);
-		Helper.deleteFolderHadoopLocal(outputPath);
+		HadoopHelper.deleteFolderHadoopLocal(outputPath);
 		FileInputFormat.setInputPaths(rankOrdering, new Path(inputPath));
 		FileOutputFormat.setOutputPath(rankOrdering, new Path(outputPath));
 
@@ -110,10 +110,5 @@ public class PageRankDriver extends Configured implements Tool {
 		return rankOrdering.waitForCompletion(true);
 	}
 
-	// Lấy dữ liệu từ Hadoop Cluster
-	public static ExampleSet getDataHadoopCluster(String pathName) throws Exception {
-		FutureTask<ExampleSet> futureTask = new FutureTask<>(new ReadFileHadoopLocalCallable(pathName));
-		futureTask.run();
-		return futureTask.get();
-	}
+
 }

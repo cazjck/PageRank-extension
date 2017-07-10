@@ -3,6 +3,7 @@ package com.rapidminer.extension.utilities;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.concurrent.FutureTask;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -10,10 +11,12 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
+import com.rapidminer.example.ExampleSet;
 
 
 
-public class Helper {
+
+public class HadoopHelper {
 	public static Object[][] convert2D(ArrayList<Object[]> arrayList) {
 		Object[][] array2D = new Object[arrayList.size()][];
 		for (int i = 0; i < array2D.length; i++) {
@@ -46,5 +49,11 @@ public class Helper {
 		if (file.exists()) {
 			FileUtils.deleteDirectory(file);
 		}
+	}
+	// Lấy dữ liệu từ Hadoop Cluster
+	public static ExampleSet getDataHadoopCluster(String pathName) throws Exception {
+		FutureTask<ExampleSet> futureTask = new FutureTask<>(new ReadFileHadoopLocalCallable(pathName));
+		futureTask.run();
+		return futureTask.get();
 	}
 }

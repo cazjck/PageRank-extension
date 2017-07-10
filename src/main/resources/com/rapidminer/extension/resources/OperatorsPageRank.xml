@@ -13,7 +13,7 @@
            <operator>
               <key>PageRank_Key</key>
               <class>com.rapidminer.extension.operator.PageRankOperator</class>
-              <icon>add.png</icon>          
+              <icon>pageRank.png</icon>          
            </operator>
          </group>
       

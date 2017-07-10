@@ -39,7 +39,7 @@ public class PageRankReducer extends Reducer<Text, Text, Text, Text> {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	private static final float damping = 0.85F;
+	private static Double damping = 0.85d;
 
 	@Override
 	public void reduce(Text page, Iterable<Text> values, Context context) throws IOException, InterruptedException {
@@ -75,5 +75,9 @@ public class PageRankReducer extends Reducer<Text, Text, Text, Text> {
 
 		// Add new pagerank to total
 		context.write(page, new Text(newRank + "\t" + links));
+	}
+	@Override
+	protected void setup(Reducer<Text, Text, Text, Text>.Context context) throws IOException, InterruptedException {
+		damping=PageRankDriver.DAMPING;
 	}
 }

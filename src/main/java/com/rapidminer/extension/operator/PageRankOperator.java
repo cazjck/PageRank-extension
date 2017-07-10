@@ -9,6 +9,7 @@ import com.rapidminer.example.Attributes;
 import com.rapidminer.example.Example;
 import com.rapidminer.example.ExampleSet;
 import com.rapidminer.extension.pagerank.PageRankDriver;
+import com.rapidminer.extension.utilities.HadoopHelper;
 import com.rapidminer.operator.Operator;
 import com.rapidminer.operator.OperatorDescription;
 import com.rapidminer.operator.OperatorException;
@@ -42,42 +43,16 @@ public class PageRankOperator extends Operator {
 
 	@Override
 	public void doWork() throws OperatorException {
-		//Logger logger = LogService.getRoot();
+		// Logger logger = LogService.getRoot();
+		// get value parameter
+		Double damping = getParameterAsDouble(PARAMETER_DAMPING);
+		int interaions = getParameterAsInt(PARAMETER_INTERATION);
+		PageRankDriver.DAMPING=damping;
+		PageRankDriver.INTERATIONS=interaions;
+		
 		ExampleSet exampleSet = input.getData(ExampleSet.class);
-
-		Attributes attributes = exampleSet.getAttributes();
-		if (attributes.size() > 2) {
-			try {
-				FileOutputStream fos = new FileOutputStream("D:/input.txt");
-				OutputStreamWriter osw = new OutputStreamWriter(fos);
-				BufferedWriter bw = new BufferedWriter(osw);
-				for (Example item : exampleSet) {
-					String id = item.get("id").toString();
-					String title = item.get("title").toString();
-					String outlink = item.get("outlink").toString();
-/*					if (outlink == "?") {
-						outlink = " ";
-					}*/
-					String line = id + "\t" + title + "\t" + outlink;
-					bw.write(line);
-					bw.newLine();
-				}
-				bw.flush();
-				osw.flush();
-				fos.flush();
-				bw.close();
-				osw.close();
-				fos.close();
-				PageRankDriver.input = "D:/input.txt";
-				// if (PageRankDriver.runHadoopLocal()) {
-
-				// }
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-			}
-
-		}
+		// save file - run on hadoop
+		saveFile(exampleSet);
 
 		// logger.log(Level.INFO, text);
 		/*
@@ -89,7 +64,7 @@ public class PageRankOperator extends Operator {
 		ExampleSet exampleSet2 = null;
 		try {
 			// exampleSet2 = PageRankDriver.getDataHadoopCluster("D:/test");
-			exampleSet2 = PageRankDriver.getDataHadoopCluster(
+			exampleSet2 = HadoopHelper.getDataHadoopCluster(
 					"J:/HK1 year 4/Do an chuyen nganh/Source Code/Hadoop_PageRank_DBLP/output/dblp2");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -103,26 +78,59 @@ public class PageRankOperator extends Operator {
 	public List<ParameterType> getParameterTypes() {
 		List<ParameterType> types = super.getParameterTypes();
 
-		/*types.add(new ParameterTypeBoolean(PARAMETER_ADVANCED,
-				"If checked, You can set property for damping, interation. Default: Damping factory is 0.85 and Interation factory 2",
-				false, false));*/
+		/*
+		 * types.add(new ParameterTypeBoolean(PARAMETER_ADVANCED,
+		 * "If checked, You can set property for damping, interation. Default: Damping factory is 0.85 and Interation factory 2"
+		 * , false, false));
+		 */
 
-		ParameterType damping = new ParameterTypeDouble(PARAMETER_DAMPING,
-				"This parameter defines damping factory.",
-				0.0,
-				1.0,
-				0.85);
+		ParameterType damping = new ParameterTypeDouble(PARAMETER_DAMPING, "This parameter defines damping factory.",
+				0.0, 1.0, 0.85);
 		ParameterType interations = new ParameterTypeInt(PARAMETER_INTERATION,
-				"This parameter defines iteration factory.",
-				1,
-				100,
-				2);
-		//type.registerDependencyCondition(new BooleanParameterCondition(this, PARAMETER_USE_CUSTOM_TEXT, true, true));
+				"This parameter defines iteration factory.", 1, 100, 2);
+		// type.registerDependencyCondition(new BooleanParameterCondition(this,
+		// PARAMETER_USE_CUSTOM_TEXT, true, true));
 
 		types.add(damping);
 		types.add(interations);
 
 		return types;
+	}
+
+	public static void saveFile(ExampleSet exampleSet) {
+		Attributes attributes = exampleSet.getAttributes();
+		if (attributes.size() > 2) {
+			try {
+				FileOutputStream fos = new FileOutputStream("/input.txt");
+				OutputStreamWriter osw = new OutputStreamWriter(fos);
+				BufferedWriter bw = new BufferedWriter(osw);
+				for (Example item : exampleSet) {
+					String id = item.get("id").toString();
+					String title = item.get("title").toString();
+					String outlink = item.get("outlink").toString();
+					/*
+					 * if (outlink == "?") { outlink = " "; }
+					 */
+					String line = id + "\t" + title + "\t" + outlink;
+					bw.write(line);
+					bw.newLine();
+				}
+				bw.flush();
+				osw.flush();
+				fos.flush();
+				bw.close();
+				osw.close();
+				fos.close();
+				PageRankDriver.input = "/input.txt";
+				// if (PageRankDriver.runHadoopLocal()) {
+
+				// }
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+			}
+
+		}
 	}
 
 }
