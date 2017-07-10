@@ -1,4 +1,4 @@
-package com.rapidminer.extension.operator;
+package com.rapidminer.pagerank.operator;
 
 import java.util.List;
 import java.util.logging.Level;

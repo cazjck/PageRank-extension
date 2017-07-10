@@ -1,4 +1,4 @@
-package com.rapidminer.extension.pagerank;
+package com.rapidminer.pagerank.pagerank;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -19,7 +19,7 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-import com.rapidminer.extension.utilities.HadoopHelper;
+import com.rapidminer.pagerank.utilities.HadoopHelper;
 
 
 

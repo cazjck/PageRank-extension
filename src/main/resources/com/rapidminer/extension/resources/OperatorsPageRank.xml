@@ -7,12 +7,12 @@
         <group key="PageRank_Group">
            <operator>
               <key>MyOperator_Key</key>
-              <class>com.rapidminer.extension.operator.MyOperator</class>
+              <class>com.rapidminer.pagerank.operator.MyOperator</class>
               <icon>add.png</icon>          
            </operator>
            <operator>
               <key>PageRank_Key</key>
-              <class>com.rapidminer.extension.operator.PageRankOperator</class>
+              <class>com.rapidminer.pagerank.operator.PageRankOperator</class>
               <icon>pageRank.png</icon>          
            </operator>
          </group>

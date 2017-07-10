@@ -1,4 +1,4 @@
-package com.rapidminer.extension.utilities;
+package com.rapidminer.pagerank.utilities;
 
 
 import java.io.File;

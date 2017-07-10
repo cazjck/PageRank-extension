@@ -1,4 +1,4 @@
-package com.rapidminer.extension.pagerank;
+package com.rapidminer.pagerank.pagerank;
 
 import java.io.IOException;
 import org.apache.hadoop.io.Text;

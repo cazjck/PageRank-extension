@@ -1,4 +1,4 @@
-package com.rapidminer.extension.operator;
+package com.rapidminer.pagerank.operator;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,8 +17,6 @@ import com.rapidminer.RapidMiner;
 import com.rapidminer.example.Attributes;
 import com.rapidminer.example.Example;
 import com.rapidminer.example.ExampleSet;
-import com.rapidminer.extension.pagerank.PageRankDriver;
-import com.rapidminer.extension.utilities.HadoopHelper;
 import com.rapidminer.operator.Operator;
 import com.rapidminer.operator.OperatorDescription;
 import com.rapidminer.operator.OperatorException;
@@ -26,6 +24,8 @@ import com.rapidminer.operator.ports.InputPort;
 import com.rapidminer.operator.ports.OutputPort;
 import com.rapidminer.operator.ports.metadata.MetaData;
 import com.rapidminer.operator.ports.metadata.SimplePrecondition;
+import com.rapidminer.pagerank.pagerank.PageRankDriver;
+import com.rapidminer.pagerank.utilities.HadoopHelper;
 import com.rapidminer.parameter.ParameterType;
 import com.rapidminer.parameter.ParameterTypeDouble;
 import com.rapidminer.parameter.ParameterTypeInt;
