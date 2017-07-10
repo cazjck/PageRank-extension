@@ -19,17 +19,15 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-import com.rapidminer.example.ExampleSet;
 import com.rapidminer.extension.utilities.HadoopHelper;
-import com.rapidminer.extension.utilities.ReadFileHadoopLocalCallable;
-import com.rapidminer.gui.tools.syntax.InputHandler.insert_char;
+
 
 
 public class PageRankDriver extends Configured implements Tool {
 	public static String input;
 	public static String LINKS_SEPARATOR = "|";
 	private static NumberFormat nf = new DecimalFormat("00");
-	public static String INPUT = "D:/pageRank/ranking/input.txt";
+	public static String INPUT = "D:/pageRank/input/input.txt";
 	public static final String OUTPUT = "D:/pageRank/ranking/iter";
 	public static final String RESULT = "D:/pageRank/result";
 	public static Double DAMPING = 0.85d;
@@ -82,13 +80,13 @@ public class PageRankDriver extends Configured implements Tool {
 		Configuration conf = new Configuration();
 		Job job = Job.getInstance(conf, "DBLP Input Calculate");
 		job.setJarByClass(PageRankDriver.class);
-		job.setMapperClass(PageRankMapper.class);
+		job.setMapperClass(RankCalculateMapper.class);
 
-		job.setReducerClass(PageRankReducer.class);
+		job.setReducerClass(RankCalculateReduce.class);
 		// job.setCombinerClass(DBLPCalculateReducer.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
-		HadoopHelper.deleteFolderHadoopLocal(outputPath);
+		HadoopHelper.deleteFolderHadoopCluster(conf,outputPath);
 		FileInputFormat.addInputPath(job, new Path(inputPath));
 		FileOutputFormat.setOutputPath(job, new Path(outputPath));
 
@@ -106,7 +104,8 @@ public class PageRankDriver extends Configured implements Tool {
 		rankOrdering.setOutputValueClass(Text.class);
 
 		rankOrdering.setMapperClass(RankingMapper.class);
-		HadoopHelper.deleteFolderHadoopLocal(outputPath);
+		rankOrdering.setSortComparatorClass(DescendingKeyComparator.class);
+		HadoopHelper.deleteFolderHadoopCluster(conf,outputPath);
 		FileInputFormat.setInputPaths(rankOrdering, new Path(inputPath));
 		FileOutputFormat.setOutputPath(rankOrdering, new Path(outputPath));
 

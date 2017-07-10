@@ -105,7 +105,7 @@ public class PageRankOperator extends Operator {
 	}
 
 	public static void saveFile(ExampleSet exampleSet) {
-		String input = "D:/pageRank/ranking/input.txt";
+		String input = "D:/pageRank/input/input.txt";
 		Attributes attributes = exampleSet.getAttributes();
 		if (attributes.size() > 2) {
 			try {
@@ -116,10 +116,12 @@ public class PageRankOperator extends Operator {
 					String id = item.get("id").toString();
 					String title = item.get("title").toString();
 					String outlink = item.get("outlink").toString();
-					/*
-					 * if (outlink == "?") { outlink = " "; }
-					 */
-					String line = id + "\t" + title + "\t" + outlink;
+
+					if (outlink.equals("?")) {
+						outlink = "";
+					}
+
+					String line = id + "\t" + 1.0 + "\t" + outlink;
 					bw.write(line);
 					bw.newLine();
 				}
@@ -130,13 +132,6 @@ public class PageRankOperator extends Operator {
 				osw.close();
 				fos.close();
 				PageRankDriver.INPUT = input;
-				// if (PageRankDriver.runHadoopLocal()) {
-
-				// }
-				File f = new File(input);
-				// System.out.println(f.getAbsolutePath());
-				Logger logger = LogService.getRoot();
-				logger.log(Level.INFO, "Dia chi la :" + f.getAbsolutePath());
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {

@@ -13,8 +13,8 @@ public class PageRankMapper extends Mapper<Object, Text, Text, Text> {
 	 * The `map(...)` method is executed against each item in the input split. A
 	 * key-value pair is mapped to another, intermediate, key-value pair.
 	 *
-	 * Specifically, this method should take Text objects in the form `
-	 * "[page] [initialPagerank] outLinkA,outLinkB,outLinkC..."` and store a new
+	 * Specifically, this method should take Text objects in the form ` "[page]
+	 * [initialPagerank] outLinkA,outLinkB,outLinkC..."` and store a new
 	 * key-value pair mapping linked pages to this page's name, rank and total
 	 * number of links: `"[otherPage] [thisPage] [thisPagesRank]
 	 * [thisTotalNumberOfLinks]"
@@ -38,41 +38,47 @@ public class PageRankMapper extends Mapper<Object, Text, Text, Text> {
 
 	public void map(Object key, Text value, Context context) {
 		try {
+			int pageTabIndex = value.find("\t");
+			int rankTabIndex = value.find("\t", pageTabIndex + 1);
+
 			// Gets the string of the value
-			String valueStr = value.toString();
-			// split data
-			String[] sections = valueStr.split("\t");
 			// Gets the mapped page
-			String id = sections[0];
+			String id = Text.decode(value.getBytes(), 0, pageTabIndex);
 			// Get title
-			String title = sections[1];
-			String page=id+"|"+title;
+			String title = Text.decode(value.getBytes(), pageTabIndex+1, rankTabIndex + 1);
+			String page = id + "|" + title;
 			// get array outlinks
 			// Gets the [thisPage] [thisPagesRank]
 			String mappedPageStr = page + "\t" + 1.0;
-			String outLinks = sections[2];
+			context.write(new Text(page), new Text("!"));
+			// Skip pages with no links.
+			if (rankTabIndex == -1)
+				return;
+			String outLinks = Text.decode(value.getBytes(), rankTabIndex + 1, value.getLength() - (rankTabIndex + 1));
+			// Mark page as an Existing page (ignore red wiki-links)
 
 			// Ignore if page not enough property
 			// Ignore if page contains no links
-			if (sections.length < 3 || outLinks.equals("?")) {
-				/*context.write(new Text(id), new Text(PageRankDriver.LINKS_SEPARATOR + title + "\t" + "?"));
-				return;*/
-				// Mark page as an Existing page (ignore red wiki-links)
-		        context.write(new Text(page), new Text("! "));
-		        return;
-			}
+			/*
+			 * if (sections.length < 3 || outLinks.equals("?")) {
+			 * context.write(new Text(id), new
+			 * Text(PageRankDriver.LINKS_SEPARATOR + title + "\t" + "?"));
+			 * return; // Mark page as an Existing page (ignore red wiki-links)
+			 * context.write(new Text(page), new Text("! ")); return; }
+			 */
 
 			// Gets the linked pages and [thisTotalNumberOfLinks]
 			String[] allOtherPages = outLinks.split(",");
 			int total = allOtherPages.length;
-			 
-			// For each linked to page, store [thisPage] [thisPagesRank] [thisTotalNumberOfLinks]
+
+			// For each linked to page, store [thisPage] [thisPagesRank]
+			// [thisTotalNumberOfLinks]
 			for (String otherPage : allOtherPages) {
 				context.write(new Text(otherPage), new Text(mappedPageStr + "\t" + total));
 			}
 
 			// Adds original links for preservation
-			context.write(new Text(page), new Text("! " + outLinks));
+			context.write(new Text(page), new Text("|" + outLinks));
 
 		} catch (Exception e) {
 			System.out.println(value.toString());

@@ -43,22 +43,24 @@ public class PageRankReducer extends Reducer<Text, Text, Text, Text> {
 
 	@Override
 	public void reduce(Text page, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-		boolean isExistingWikiPage = false;
-		float sumShareOtherPageRanks = 0;
-		String links = "";
-		for (Text value : values) {
-			String pageStr = value.toString();
-/*			
-			if (pageStr.equals("!")) {
-				isExistingWikiPage = true;
-				continue;
-			}*/
-			// If it is a links record, add it to the links array
-			if (pageStr.startsWith("! ")) {
-				links = pageStr.substring(2);
-				continue;
-			}
-			// If it is a normal record however
+		String s = null;
+		try {
+			boolean isExistingWikiPage = false;
+			float sumShareOtherPageRanks = 0;
+			String links = "";
+			for (Text value : values) {
+				String pageStr = value.toString();
+				s = pageStr;
+				if (pageStr.equals("!")) {
+					isExistingWikiPage = true;
+					continue;
+				}
+				// If it is a links record, add it to the links array
+				if (pageStr.startsWith("|")) {
+					links = pageStr.substring(1);
+					continue;
+				}
+				// If it is a normal record however
 				// Find the pagerank and number of links for the given page
 				String[] sections = pageStr.split("\t");
 				float currentPageRank = Float.valueOf(sections[1]);
@@ -67,17 +69,23 @@ public class PageRankReducer extends Reducer<Text, Text, Text, Text> {
 				// Add the given pagerank to the running total for the other
 				// pages
 				sumShareOtherPageRanks += (currentPageRank / countOutLinks);
-		}
-/*		if (!isExistingWikiPage)
-			return;*/
-		// Calculate pagerank by applying the dampening to the sum
-		double newRank = (1 - damping) + (damping * sumShareOtherPageRanks);
+			}
+			if (!isExistingWikiPage)
+				return;
+			// Calculate pagerank by applying the dampening to the sum
+			double newRank = (1 - damping) + (damping * sumShareOtherPageRanks);
 
-		// Add new pagerank to total
-		context.write(page, new Text(newRank + "\t" + links));
+			// Add new pagerank to total
+			context.write(page, new Text(newRank + "\t" + links));
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println(s);
+		}
+
 	}
+
 	@Override
 	protected void setup(Reducer<Text, Text, Text, Text>.Context context) throws IOException, InterruptedException {
-		damping=PageRankDriver.DAMPING;
+		damping = PageRankDriver.DAMPING;
 	}
 }
