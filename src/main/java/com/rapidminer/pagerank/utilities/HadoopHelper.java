@@ -1,20 +1,15 @@
 package com.rapidminer.pagerank.utilities;
 
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.FutureTask;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
 import com.rapidminer.example.ExampleSet;
-
-
-
 
 public class HadoopHelper {
 	public static Object[][] convert2D(ArrayList<Object[]> arrayList) {
@@ -34,6 +29,16 @@ public class HadoopHelper {
 		}
 		return array2D;
 	}
+
+	public static String[][] convert2DString1(ArrayList<ArrayList<String>> arrayList) {
+		String[][] array2D = new String[arrayList.size()][];
+		for (int i = 0; i < array2D.length; i++) {
+			ArrayList<String> row = arrayList.get(i);
+			array2D[i] = row.toArray(new String[row.size()]);
+		}
+		return array2D;
+	}
+
 	// Xóa file trong Hadoop Cluster
 	public static void deleteFolderHadoopCluster(Configuration conf, String folderPath) throws Exception {
 		FileSystem fs = FileSystem.get(conf);
@@ -42,14 +47,15 @@ public class HadoopHelper {
 			fs.delete(path, true);
 		}
 	}
-	
+
 	// Xóa file trong Hadoop Local
 	public static void deleteFolderHadoopLocal(String folderPath) throws Exception {
-		File file=new File(folderPath);
+		File file = new File(folderPath);
 		if (file.exists()) {
 			FileUtils.deleteDirectory(file);
 		}
 	}
+
 	// Lấy dữ liệu từ Hadoop Cluster
 	public static ExampleSet getDataHadoopCluster(String pathName) throws Exception {
 		FutureTask<ExampleSet> futureTask = new FutureTask<>(new ReadFileHadoopLocalCallable(pathName));

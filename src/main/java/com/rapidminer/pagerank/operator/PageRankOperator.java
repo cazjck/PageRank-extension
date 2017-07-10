@@ -24,6 +24,7 @@ import com.rapidminer.operator.ports.InputPort;
 import com.rapidminer.operator.ports.OutputPort;
 import com.rapidminer.operator.ports.metadata.MetaData;
 import com.rapidminer.operator.ports.metadata.SimplePrecondition;
+import com.rapidminer.operator.preprocessing.filter.ChangeAttributeName;
 import com.rapidminer.pagerank.pagerank.PageRankDriver;
 import com.rapidminer.pagerank.utilities.HadoopHelper;
 import com.rapidminer.parameter.ParameterType;
@@ -44,13 +45,14 @@ public class PageRankOperator extends Operator {
 	public static final String PARAMETER_ADVANCED = "Advanced";
 	public static final String PARAMETER_DAMPING = "Damping factor";
 	public static final String PARAMETER_INTERATION = "Iteration factor";
-
 	public PageRankOperator(OperatorDescription description) {
 		super(description);
 		MetaData desiredMetaData = new MetaData(ExampleSet.class);
 		SimplePrecondition simplePrecondition = new SimplePrecondition(input, desiredMetaData);
 		input.addPrecondition(simplePrecondition);
 		getTransformer().addPassThroughRule(input, output);
+		//ChangeAttributeName changeAttributeName=new ChangeAttributeName(getOperatorDescription());
+		
 	}
 
 	@Override

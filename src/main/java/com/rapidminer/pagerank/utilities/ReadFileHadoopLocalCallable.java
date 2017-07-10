@@ -53,14 +53,7 @@ public class ReadFileHadoopLocalCallable implements Callable<ExampleSet> {
 			}
 			arrayList.add(arr);
 		}	
-		//System.out.println(arrayList.toString());
-		String[][] array2D = new String[arrayList.size()][];
-		for (int i = 0; i < array2D.length; i++) {
-		    ArrayList<String> row = arrayList.get(i);
-		    array2D[i] = row.toArray(new String[row.size()]);
-		}
-		//System.out.println("------------------");
-		//System.out.println(array2D);
+		String[][] array2D =HadoopHelper.convert2DString1(arrayList);
 		return ExampleSetFactory.createExampleSet(array2D);
 	}
 
