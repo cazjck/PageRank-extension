@@ -1,0 +1,63 @@
+buildscript {
+	repositories {
+	    jcenter()
+		maven { url 'https://maven.rapidminer.com/content/groups/public/' }
+	}
+}
+
+plugins { id 'com.rapidminer.extension' version '0.9.2' }
+
+// Define Maven artifact repositories
+repositories {
+    jcenter()
+	maven { url 'https://maven.rapidminer.com/content/groups/public/' }
+}
+
+extensionConfig {
+
+    // The extension name
+    name 'Page Rank Extension'
+
+    /*
+     * The artifact group which will be used when publishing the extensions Jar
+     * and for package customization when initializing the project repository.
+     *
+     * It is 'com.rapidminer.extension' by default.
+     */
+    groupId = 'com.rapidminer.extension'
+
+    /*
+     * The extension vendor which will be displayed in the extensions about box
+     * and for customizing the license headers when initializing the project repository.
+     *
+     * It is 'RapidMiner GmbH' by default.
+     */
+    vendor = "PDK"
+
+    /*
+     * The vendor homepage which will be displayed in the extensions about box
+     * and for customizing the license headers when initializing the project repository.
+     *
+     * It is 'www.rapidminer.com' by default.
+     */
+    homepage = "www.pdk.info"
+
+    // define RapidMiner version and extension dependencies
+    dependencies {
+        rapidminer '7.4.0'
+        //extension namespace: 'text', version: '7.4.1'
+    }
+}
+
+// Define third party library dependencies
+dependencies {
+	//compile 'com.google.guava:guava:18.0'
+	compile "org.apache.hadoop:hadoop-hdfs:2.7.3"
+	compile "org.apache.hadoop:hadoop-client:2.7.3"
+	compile "org.apache.hadoop:hadoop-mapreduce-client-core:2.7.3"
+	compile "org.apache.hadoop:hadoop-yarn-common:2.7.3"
+	compile "org.apache.hadoop:hadoop-mapreduce-client-jobclient:2.7.3"
+	compile "org.apache.hadoop:hadoop-yarn-client:2.7.3"
+	compile "org.apache.hadoop:hadoop-yarn:2.7.3"
+	compile "org.apache.hadoop:hadoop-common:2.7.3"
+}

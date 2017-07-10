@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<operators name="template" version="6.0" docbundle="com/rapidminer/extension/resources/i18n/OperatorsDocPageRank">
+    <group key="">
+        <!-- This is an example how to specify Operators and Operator groups. The Operator groups define
+                where Operators will be located in the Operator tree. -->
+       
+        <group key="PageRank_Group">
+           <operator>
+              <key>MyOperator_Key</key>
+              <class>com.rapidminer.extension.operator.MyOperator</class>
+              <icon>add.png</icon>          
+           </operator>
+           <operator>
+              <key>PageRank_Key</key>
+              <class>com.rapidminer.extension.operator.PageRankOperator</class>
+              <icon>add.png</icon>          
+           </operator>
+         </group>
+      
+    </group>
+</operators>
