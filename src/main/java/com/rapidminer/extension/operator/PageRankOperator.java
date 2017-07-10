@@ -9,7 +9,10 @@ import com.rapidminer.example.Attributes;
 import com.rapidminer.example.Example;
 import com.rapidminer.example.ExampleSet;
 import com.rapidminer.extension.pagerank.PageRankDriver;
+<<<<<<< HEAD
 import com.rapidminer.extension.utilities.HadoopHelper;
+=======
+>>>>>>> 7bb561ab929e852b668c001b161bb6a599204d3b
 import com.rapidminer.operator.Operator;
 import com.rapidminer.operator.OperatorDescription;
 import com.rapidminer.operator.OperatorException;
@@ -43,6 +46,7 @@ public class PageRankOperator extends Operator {
 
 	@Override
 	public void doWork() throws OperatorException {
+<<<<<<< HEAD
 		// Logger logger = LogService.getRoot();
 		// get value parameter
 		Double damping = getParameterAsDouble(PARAMETER_DAMPING);
@@ -50,6 +54,9 @@ public class PageRankOperator extends Operator {
 		PageRankDriver.DAMPING=damping;
 		PageRankDriver.INTERATIONS=interaions;
 		
+=======
+		//Logger logger = LogService.getRoot();
+>>>>>>> 7bb561ab929e852b668c001b161bb6a599204d3b
 		ExampleSet exampleSet = input.getData(ExampleSet.class);
 		// save file - run on hadoop
 		saveFile(exampleSet);
