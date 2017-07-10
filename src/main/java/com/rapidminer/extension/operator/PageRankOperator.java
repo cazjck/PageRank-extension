@@ -1,18 +1,24 @@
 package com.rapidminer.extension.operator;
 
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.mail.FolderNotFoundException;
+
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+
+import com.rapidminer.RapidMiner;
 import com.rapidminer.example.Attributes;
 import com.rapidminer.example.Example;
 import com.rapidminer.example.ExampleSet;
 import com.rapidminer.extension.pagerank.PageRankDriver;
-<<<<<<< HEAD
 import com.rapidminer.extension.utilities.HadoopHelper;
-=======
->>>>>>> 7bb561ab929e852b668c001b161bb6a599204d3b
 import com.rapidminer.operator.Operator;
 import com.rapidminer.operator.OperatorDescription;
 import com.rapidminer.operator.OperatorException;
@@ -23,6 +29,8 @@ import com.rapidminer.operator.ports.metadata.SimplePrecondition;
 import com.rapidminer.parameter.ParameterType;
 import com.rapidminer.parameter.ParameterTypeDouble;
 import com.rapidminer.parameter.ParameterTypeInt;
+import com.rapidminer.repository.Folder;
+import com.rapidminer.tools.LogService;
 
 /**
  * 
@@ -30,6 +38,7 @@ import com.rapidminer.parameter.ParameterTypeInt;
  *
  */
 public class PageRankOperator extends Operator {
+
 	private InputPort input = getInputPorts().createPort("input");
 	private OutputPort output = getOutputPorts().createPort("result");
 	public static final String PARAMETER_ADVANCED = "Advanced";
@@ -46,39 +55,30 @@ public class PageRankOperator extends Operator {
 
 	@Override
 	public void doWork() throws OperatorException {
-<<<<<<< HEAD
 		// Logger logger = LogService.getRoot();
 		// get value parameter
 		Double damping = getParameterAsDouble(PARAMETER_DAMPING);
 		int interaions = getParameterAsInt(PARAMETER_INTERATION);
-		PageRankDriver.DAMPING=damping;
-		PageRankDriver.INTERATIONS=interaions;
-		
-=======
-		//Logger logger = LogService.getRoot();
->>>>>>> 7bb561ab929e852b668c001b161bb6a599204d3b
+		PageRankDriver.DAMPING = damping;
+		PageRankDriver.INTERATIONS = interaions;
+
 		ExampleSet exampleSet = input.getData(ExampleSet.class);
 		// save file - run on hadoop
 		saveFile(exampleSet);
 
-		// logger.log(Level.INFO, text);
-		/*
-		 * double[][] data1 = { { 1, 2, 3, 4 }, { 5, 6, 7, 8 } }; double[][]
-		 * data2 = { { 1, 2, 3, 5 }, { 5, 6, 7, 9 } }; ExampleSet s1 =
-		 * ExampleSetFactory.createExampleSet(data1); ExampleSet s2 =
-		 * ExampleSetFactory.createExampleSet(data2); output.deliver(s1);
-		 */
-		ExampleSet exampleSet2 = null;
+		ExampleSet exampleSetResult = null;
 		try {
-			// exampleSet2 = PageRankDriver.getDataHadoopCluster("D:/test");
-			exampleSet2 = HadoopHelper.getDataHadoopCluster(
-					"J:/HK1 year 4/Do an chuyen nganh/Source Code/Hadoop_PageRank_DBLP/output/dblp2");
+			exampleSetResult = HadoopHelper.getDataHadoopCluster(PageRankDriver.RESULT);
+			exampleSetResult.getAttributes().get("att1").setName("rank");
+			exampleSetResult.getAttributes().get("att2").setName("title");
+
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+
 		}
 
-		output.deliver(exampleSet2);
+		output.deliver(exampleSetResult);
 	}
 
 	@Override
@@ -105,10 +105,11 @@ public class PageRankOperator extends Operator {
 	}
 
 	public static void saveFile(ExampleSet exampleSet) {
+		String input = "D:/pageRank/ranking/input.txt";
 		Attributes attributes = exampleSet.getAttributes();
 		if (attributes.size() > 2) {
 			try {
-				FileOutputStream fos = new FileOutputStream("/input.txt");
+				FileOutputStream fos = new FileOutputStream(input);
 				OutputStreamWriter osw = new OutputStreamWriter(fos);
 				BufferedWriter bw = new BufferedWriter(osw);
 				for (Example item : exampleSet) {
@@ -128,10 +129,14 @@ public class PageRankOperator extends Operator {
 				bw.close();
 				osw.close();
 				fos.close();
-				PageRankDriver.input = "/input.txt";
+				PageRankDriver.INPUT = input;
 				// if (PageRankDriver.runHadoopLocal()) {
 
 				// }
+				File f = new File(input);
+				// System.out.println(f.getAbsolutePath());
+				Logger logger = LogService.getRoot();
+				logger.log(Level.INFO, "Dia chi la :" + f.getAbsolutePath());
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {

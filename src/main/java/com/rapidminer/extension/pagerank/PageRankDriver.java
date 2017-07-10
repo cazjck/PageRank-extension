@@ -29,7 +29,9 @@ public class PageRankDriver extends Configured implements Tool {
 	public static String input;
 	public static String LINKS_SEPARATOR = "|";
 	private static NumberFormat nf = new DecimalFormat("00");
-	public static final String OUTPUT = "D:/";
+	public static String INPUT = "D:/pageRank/ranking/input.txt";
+	public static final String OUTPUT = "D:/pageRank/ranking/iter";
+	public static final String RESULT = "D:/pageRank/result";
 	public static Double DAMPING = 0.85d;
 	public static int INTERATIONS = 1;
 	public static void main(String[] args) throws Exception {
@@ -52,11 +54,16 @@ public class PageRankDriver extends Configured implements Tool {
 		boolean isCompleted = false;
 
 		String lastResultPath = null;
-
+		String inPath=null;
 		for (int runs = 0; runs < INTERATIONS; runs++) {
-			//String inPath = "/pageRank/ranking/iter" + nf.format(runs);
-			String inPath = "D:/dblp.txt";
-			lastResultPath = OUTPUT+"/pageRank/ranking/iter" + nf.format(runs + 1);
+			if(runs>0){
+				 inPath = OUTPUT + nf.format(runs);
+			}
+			else {
+				inPath=INPUT;
+			}
+			
+			lastResultPath = OUTPUT+ nf.format(runs + 1);
 
 			isCompleted = runRankCalculation(inPath, lastResultPath);
 
@@ -64,8 +71,7 @@ public class PageRankDriver extends Configured implements Tool {
 				return 1;
 		}
 
-		isCompleted = runRankOrdering(lastResultPath,OUTPUT+"/pageRank/result");
-
+		isCompleted = runRankOrdering(lastResultPath,RESULT);
 		if (!isCompleted)
 			return 1;
 		return 0;
