@@ -11,7 +11,7 @@ import org.apache.hadoop.fs.Path;
 
 import com.rapidminer.example.ExampleSet;
 
-public class HadoopHelper {
+public class MaxtriHelper {
 	public static Object[][] convert2D(ArrayList<Object[]> arrayList) {
 		Object[][] array2D = new Object[arrayList.size()][];
 		for (int i = 0; i < array2D.length; i++) {
@@ -39,22 +39,7 @@ public class HadoopHelper {
 		return array2D;
 	}
 
-	// Xóa file trong Hadoop Cluster
-	public static void deleteFolderHadoopCluster(Configuration conf, String folderPath) throws Exception {
-		FileSystem fs = FileSystem.get(conf);
-		Path path = new Path(folderPath);
-		if (fs.exists(path)) {
-			fs.delete(path, true);
-		}
-	}
 
-	// Xóa file trong Hadoop Local
-	public static void deleteFolderHadoopLocal(String folderPath) throws Exception {
-		File file = new File(folderPath);
-		if (file.exists()) {
-			FileUtils.deleteDirectory(file);
-		}
-	}
 
 	// Lấy dữ liệu từ Hadoop Cluster
 	public static ExampleSet getDataHadoopCluster(String pathName) throws Exception {

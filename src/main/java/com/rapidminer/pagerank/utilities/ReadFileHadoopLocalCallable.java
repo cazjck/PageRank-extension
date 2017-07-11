@@ -53,7 +53,7 @@ public class ReadFileHadoopLocalCallable implements Callable<ExampleSet> {
 			}
 			arrayList.add(arr);
 		}	
-		String[][] array2D =HadoopHelper.convert2DString1(arrayList);
+		String[][] array2D =MaxtriHelper.convert2DString1(arrayList);
 		return ExampleSetFactory.createExampleSet(array2D);
 	}
 

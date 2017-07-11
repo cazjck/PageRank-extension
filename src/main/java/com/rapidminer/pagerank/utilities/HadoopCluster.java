@@ -1,7 +1,6 @@
 package com.rapidminer.pagerank.utilities;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.concurrent.FutureTask;
 
 import org.apache.commons.io.FileUtils;
@@ -38,19 +37,19 @@ public class HadoopCluster {
 	// Lấy dữ liệu từ localhost
 	public static ExampleSet getDataHadoopLocal(String pathName) throws Exception {
 		FutureTask<ExampleSet> futureTask = new FutureTask<>(
-				new ReadFileHadoopLocalCallable(pathName + "/part-r-00000"));
+				new ReadFileHadoopLocalCallable(pathName));
 		futureTask.run();
 		return futureTask.get();
 	}
 
 	// Lấy dữ liệu từ Hadoop Cluster
 	public static ExampleSet getDataHadoopCluster(String pathName) throws Exception {
-		System.out.println(pathName + "part-r-00000");
 		FutureTask<ExampleSet> futureTask = new FutureTask<>(
-				new ReadFileHadoopClusterCallable(pathName + "/part-r-00000"));
+				new ReadFileHadoopClusterCallable(pathName));
 		futureTask.run();
 		return futureTask.get();
 	}
+	
 
 
 	// Xóa file trong Hadoop Cluster
@@ -69,6 +68,7 @@ public class HadoopCluster {
 			file.delete();
 		}
 	}
+
 	// Xóa file trong Hadoop Local
 	public static void deleteFolderHadoop(String folderPath) throws Exception {
 		File file = new File(folderPath);

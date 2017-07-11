@@ -39,7 +39,7 @@ public class ReadFileHadoopClusterCallable implements Callable<ExampleSet> {
 			fs.close();
 		}
 
-		String[][] array2D =HadoopHelper.convert2DString(arrayList);
+		String[][] array2D =MaxtriHelper.convert2DString(arrayList);
 		return ExampleSetFactory.createExampleSet(array2D);
 	}
 

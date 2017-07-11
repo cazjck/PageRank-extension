@@ -1,19 +1,10 @@
 package com.rapidminer.pagerank.operator;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import javax.mail.FolderNotFoundException;
-
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-
-import com.rapidminer.RapidMiner;
 import com.rapidminer.example.Attributes;
 import com.rapidminer.example.Example;
 import com.rapidminer.example.ExampleSet;
@@ -24,14 +15,11 @@ import com.rapidminer.operator.ports.InputPort;
 import com.rapidminer.operator.ports.OutputPort;
 import com.rapidminer.operator.ports.metadata.MetaData;
 import com.rapidminer.operator.ports.metadata.SimplePrecondition;
-import com.rapidminer.operator.preprocessing.filter.ChangeAttributeName;
 import com.rapidminer.pagerank.pagerank.PageRankDriver;
-import com.rapidminer.pagerank.utilities.HadoopHelper;
+import com.rapidminer.pagerank.utilities.MaxtriHelper;
 import com.rapidminer.parameter.ParameterType;
 import com.rapidminer.parameter.ParameterTypeDouble;
 import com.rapidminer.parameter.ParameterTypeInt;
-import com.rapidminer.repository.Folder;
-import com.rapidminer.tools.LogService;
 
 /**
  * 
@@ -45,14 +33,16 @@ public class PageRankOperator extends Operator {
 	public static final String PARAMETER_ADVANCED = "Advanced";
 	public static final String PARAMETER_DAMPING = "Damping factor";
 	public static final String PARAMETER_INTERATION = "Iteration factor";
+
 	public PageRankOperator(OperatorDescription description) {
 		super(description);
 		MetaData desiredMetaData = new MetaData(ExampleSet.class);
 		SimplePrecondition simplePrecondition = new SimplePrecondition(input, desiredMetaData);
 		input.addPrecondition(simplePrecondition);
 		getTransformer().addPassThroughRule(input, output);
-		//ChangeAttributeName changeAttributeName=new ChangeAttributeName(getOperatorDescription());
-		
+		// ChangeAttributeName changeAttributeName=new
+		// ChangeAttributeName(getOperatorDescription());
+
 	}
 
 	@Override
@@ -70,7 +60,7 @@ public class PageRankOperator extends Operator {
 
 		ExampleSet exampleSetResult = null;
 		try {
-			exampleSetResult = HadoopHelper.getDataHadoopCluster(PageRankDriver.RESULT);
+			exampleSetResult = MaxtriHelper.getDataHadoopCluster(PageRankDriver.RESULT_LOCAL);
 			exampleSetResult.getAttributes().get("att1").setName("rank");
 			exampleSetResult.getAttributes().get("att2").setName("title");
 
@@ -116,7 +106,7 @@ public class PageRankOperator extends Operator {
 				BufferedWriter bw = new BufferedWriter(osw);
 				for (Example item : exampleSet) {
 					String id = item.get("id").toString();
-					String title = item.get("title").toString();
+					// String title = item.get("title").toString();
 					String outlink = item.get("outlink").toString();
 
 					if (outlink.equals("?")) {
@@ -128,17 +118,12 @@ public class PageRankOperator extends Operator {
 					bw.newLine();
 				}
 				bw.flush();
-				osw.flush();
-				fos.flush();
 				bw.close();
-				osw.close();
-				fos.close();
-				PageRankDriver.INPUT = input;
+				PageRankDriver.INPUT_LOCAL = input;
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
 			}
-
 		}
 	}
 
