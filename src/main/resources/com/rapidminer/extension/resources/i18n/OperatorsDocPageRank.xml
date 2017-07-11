@@ -2,20 +2,25 @@
 <operatorHelp lang="en_EN">
 	<!-- This is an example how to specify the translation of operator keys 
 		to names. -->
-
-	<operator>
-		<key>MyOperator_Key</key>
-		<name>Test</name>
-	</operator>
-	<operator>
-		<key>PageRank_Key</key>
-		<name>Page Rank</name>
-	</operator>
-	
-	<group>
+	<group key="PageRank">
 		<key>PageRank_Group</key>
 		<name>Page Rank Group</name>
+		<operator>
+			<key>MyOperator_Key</key>
+			<name>Test</name>
+		</operator>
+		<operator>
+			<key>PageRank_Key</key>
+			<name>Page Rank</name>
+		</operator>
+		<operator>
+			<key>PageRank_File_Key</key>
+			<name>Page Rank File</name>
+		</operator>
 	</group>
+
+
+
 
 
 </operatorHelp>

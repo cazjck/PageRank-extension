@@ -21,7 +21,7 @@ public class ReadFileHadoopLocalCallable implements Callable<ExampleSet> {
 	String line;
 
 	public ReadFileHadoopLocalCallable(String path) throws Exception {
-		fis = new FileInputStream(new File(path + "/part-r-00000"));
+		fis = new FileInputStream(new File(path));
 		is = new InputStreamReader(fis);
 		br = new BufferedReader(is);
 		arrayList = new ArrayList<>();

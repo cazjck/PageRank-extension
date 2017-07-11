@@ -1,13 +1,8 @@
 package com.rapidminer.pagerank.utilities;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.FutureTask;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 
 import com.rapidminer.example.ExampleSet;
 

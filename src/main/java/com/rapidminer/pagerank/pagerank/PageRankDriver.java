@@ -17,6 +17,7 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
 import com.rapidminer.pagerank.utilities.HadoopCluster;
+import com.rapidminer.pagerank.utilities.HadoopUtilities;
 
 public class PageRankDriver extends Configured implements Tool {
 	public static String input;
@@ -111,7 +112,7 @@ public class PageRankDriver extends Configured implements Tool {
 		// job.setCombinerClass(DBLPCalculateReducer.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
-		HadoopCluster.deleteFolderHadoopCluster(conf, outputPath);
+		HadoopUtilities.deleteFolderHadoopCluster(conf, outputPath);
 		FileInputFormat.addInputPath(job, new Path(inputPath));
 		FileOutputFormat.setOutputPath(job, new Path(outputPath));
 
@@ -128,7 +129,7 @@ public class PageRankDriver extends Configured implements Tool {
 
 		rankOrdering.setMapperClass(RankingMapper.class);
 		rankOrdering.setSortComparatorClass(DescendingKeyComparator.class);
-		HadoopCluster.deleteFolderHadoopCluster(conf, outputPath);
+		HadoopUtilities.deleteFolderHadoopCluster(conf, outputPath);
 		FileInputFormat.setInputPaths(rankOrdering, new Path(inputPath));
 		FileOutputFormat.setOutputPath(rankOrdering, new Path(outputPath));
 

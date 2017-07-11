@@ -88,7 +88,6 @@ public class PageRankOperator extends Operator {
 		ParameterType interations = new ParameterTypeInt(PARAMETER_INTERATION,
 				"This parameter defines iteration factory.", 1, 100, 2);
 		// type.registerDependencyCondition(new BooleanParameterCondition(this,
-		// PARAMETER_USE_CUSTOM_TEXT, true, true));
 
 		types.add(damping);
 		types.add(interations);
