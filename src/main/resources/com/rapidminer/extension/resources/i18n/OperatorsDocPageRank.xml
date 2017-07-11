@@ -16,6 +16,10 @@
 		<key>PageRank_Group</key>
 		<name>Page Rank Group</name>
 	</group>
+	<group>
+		<key>PageRank_File_Key</key>
+		<name>Page Rank File</name>
+	</group>
 
 
 </operatorHelp>

@@ -15,6 +15,12 @@
               <class>com.rapidminer.pagerank.operator.PageRankOperator</class>
               <icon>pageRank.png</icon>          
            </operator>
+           
+           <operator>
+              <key>PageRank_File_Key</key>
+              <class>com.rapidminer.pagerank.file.LoadFilePageRankOperator</class>
+              <icon>add.png</icon>          
+           </operator>
          </group>
       
     </group>
