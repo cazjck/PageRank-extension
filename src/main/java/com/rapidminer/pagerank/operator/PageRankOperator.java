@@ -1,12 +1,7 @@
 package com.rapidminer.pagerank.operator;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
 import java.util.List;
 
-import com.rapidminer.example.Attributes;
-import com.rapidminer.example.Example;
 import com.rapidminer.example.ExampleSet;
 import com.rapidminer.operator.Operator;
 import com.rapidminer.operator.OperatorDescription;
@@ -16,6 +11,7 @@ import com.rapidminer.operator.ports.OutputPort;
 import com.rapidminer.operator.ports.metadata.MetaData;
 import com.rapidminer.operator.ports.metadata.SimplePrecondition;
 import com.rapidminer.pagerank.pagerank.PageRankDriver;
+import com.rapidminer.pagerank.utilities.HadoopUtilities;
 import com.rapidminer.pagerank.utilities.MaxtriHelper;
 import com.rapidminer.parameter.ParameterType;
 import com.rapidminer.parameter.ParameterTypeDouble;
@@ -55,8 +51,9 @@ public class PageRankOperator extends Operator {
 		PageRankDriver.INTERATIONS = interaions;
 
 		ExampleSet exampleSet = input.getData(ExampleSet.class);
-		// save file - run on hadoop
-		saveFile(exampleSet);
+
+		// Save file to local - run Hadoop on local
+		HadoopUtilities.saveExampleSetToFile(exampleSet);
 
 		ExampleSet exampleSetResult = null;
 		try {
@@ -93,37 +90,6 @@ public class PageRankOperator extends Operator {
 		types.add(interations);
 
 		return types;
-	}
-
-	public static void saveFile(ExampleSet exampleSet) {
-		String input = "D:/pageRank/input/input.txt";
-		Attributes attributes = exampleSet.getAttributes();
-		if (attributes.size() > 2) {
-			try {
-				FileOutputStream fos = new FileOutputStream(input);
-				OutputStreamWriter osw = new OutputStreamWriter(fos);
-				BufferedWriter bw = new BufferedWriter(osw);
-				for (Example item : exampleSet) {
-					String id = item.get("id").toString();
-					// String title = item.get("title").toString();
-					String outlink = item.get("outlink").toString();
-
-					if (outlink.equals("?")) {
-						outlink = "";
-					}
-
-					String line = id + "\t" + 1.0 + "\t" + outlink;
-					bw.write(line);
-					bw.newLine();
-				}
-				bw.flush();
-				bw.close();
-				PageRankDriver.INPUT_LOCAL = input;
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-			}
-		}
 	}
 
 }

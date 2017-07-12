@@ -23,12 +23,12 @@ public class PageRankDriver extends Configured implements Tool {
 	public static String input;
 	public static String LINKS_SEPARATOR = "|";
 	private static NumberFormat nf = new DecimalFormat("00");
-	public static String INPUT_LOCAL = "D:/pageRank/input/input.txt";
-	public static final String OUTPUT__LOCAL = "D:/pageRank/ranking/iter";
-	public static final String RESULT_LOCAL = "D:/pageRank/result";
+	public static final String INPUT_LOCAL = HadoopUtilities.PATH_RAPIDMINER + "/pageRank/input/input.txt";
+	public static final String OUTPUT__LOCAL = HadoopUtilities.PATH_RAPIDMINER + "/pageRank/ranking/iter";
+	public static final String RESULT_LOCAL = HadoopUtilities.PATH_RAPIDMINER + "/pageRank/result";
 	public static final String INPUT_CLUSTER = HadoopCluster.DEFAULT_FS + "/input/input.txt";
-	public static final String OUTPUT_CLUSTER = "D:/pageRank/result";
-	public static final String RESULT_CLUSTER = "D:/pageRank/result";
+	public static final String OUTPUT_CLUSTER = HadoopCluster.DEFAULT_FS + "/pageRank/ranking/iter";
+	public static final String RESULT_CLUSTER = HadoopCluster.DEFAULT_FS + "/pageRank/result";
 	public static Double DAMPING = 0.85d;
 	public static int INTERATIONS = 1;
 	public static Boolean CLUSTER = false;
@@ -76,19 +76,19 @@ public class PageRankDriver extends Configured implements Tool {
 		return 0;
 	}
 
-	public static int runHadoop(String inputPath, String outputPath) throws Exception {
+	public static int runPageRankHadoop(String inputPath, String outputPath) throws Exception {
 		Configuration conf = (CLUSTER) ? conf = HadoopCluster.getConf() : new Configuration();
 		boolean isCompleted = false;
 		String lastResultPath = null;
 		String inPath = null;
 		for (int runs = 0; runs < INTERATIONS; runs++) {
 			if (runs > 0) {
-				inPath = OUTPUT__LOCAL + nf.format(runs);
+				inPath = (CLUSTER) ? OUTPUT_CLUSTER + nf.format(runs) : OUTPUT__LOCAL + nf.format(runs);
 			} else {
-				inPath = INPUT_LOCAL;
+				inPath = (CLUSTER) ? INPUT_CLUSTER : INPUT_LOCAL;
 			}
 
-			lastResultPath = OUTPUT__LOCAL + nf.format(runs + 1);
+			lastResultPath = (CLUSTER) ? OUTPUT_CLUSTER + nf.format(runs + 1) : OUTPUT__LOCAL + nf.format(runs + 1);
 
 			isCompleted = runRankCalculation(conf, inPath, lastResultPath);
 
@@ -104,7 +104,7 @@ public class PageRankDriver extends Configured implements Tool {
 
 	public static boolean runRankCalculation(Configuration conf, String inputPath, String outputPath) throws Exception {
 
-		Job job = Job.getInstance(conf, "DBLP Input Calculate");
+		Job job = Job.getInstance(conf, "Rank Calculation");
 		job.setJarByClass(PageRankDriver.class);
 		job.setMapperClass(RankCalculateMapper.class);
 
@@ -121,7 +121,7 @@ public class PageRankDriver extends Configured implements Tool {
 
 	private static boolean runRankOrdering(Configuration conf, String inputPath, String outputPath) throws Exception {
 
-		Job rankOrdering = Job.getInstance(conf, "rankOrdering");
+		Job rankOrdering = Job.getInstance(conf, "Rank Ordeing");
 		rankOrdering.setJarByClass(PageRankDriver.class);
 
 		rankOrdering.setOutputKeyClass(FloatWritable.class);
