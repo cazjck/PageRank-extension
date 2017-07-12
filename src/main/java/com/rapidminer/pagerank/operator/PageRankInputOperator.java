@@ -20,6 +20,7 @@ import com.rapidminer.operator.ports.OutputPort;
 import com.rapidminer.operator.ports.metadata.MetaData;
 import com.rapidminer.operator.ports.metadata.SimplePrecondition;
 import com.rapidminer.pagerank.pagerank.PageRankDriver;
+import com.rapidminer.pagerank.utilities.HadoopUtilities;
 import com.rapidminer.pagerank.utilities.MaxtriHelper;
 import com.rapidminer.parameter.ParameterType;
 import com.rapidminer.parameter.ParameterTypeBoolean;
@@ -128,7 +129,7 @@ public class PageRankInputOperator extends AbstractDataResultSetReader {
 	}
 
 	public static void saveFile(ExampleSet exampleSet) {
-		String input = "D:/pageRank/input/input.txt";
+		String input = HadoopUtilities.PATH_RAPIDMINER+"/pageRank/input/input.txt";
 		Attributes attributes = exampleSet.getAttributes();
 		if (attributes.size() > 2) {
 			try {
@@ -150,7 +151,6 @@ public class PageRankInputOperator extends AbstractDataResultSetReader {
 				}
 				bw.flush();
 				bw.close();
-				PageRankDriver.INPUT_LOCAL = input;
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {

@@ -5,7 +5,11 @@ import java.util.concurrent.FutureTask;
 
 
 import com.rapidminer.example.ExampleSet;
-
+/**
+ * 
+ * @author Khanh Duy Pham
+ *
+ */
 public class MaxtriHelper {
 	public static Object[][] convert2D(ArrayList<Object[]> arrayList) {
 		Object[][] array2D = new Object[arrayList.size()][];

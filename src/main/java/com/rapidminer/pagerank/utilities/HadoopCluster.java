@@ -9,9 +9,9 @@ public class HadoopCluster {
 	public static String HOST = "namenode";
 	public static String PORT_YARN = "8032";
 	public static String PORT_HDFS = "9000";
-	public static String YARN_RESOURCE = HOST + ":" + PORT_YARN;
-	public static String DEFAULT_FS = "hdfs://" + HOST + ":" + PORT_HDFS;
-	public static String DEFAULT_FS_INPUT = DEFAULT_FS + "/input";
+	public static final String YARN_RESOURCE = HOST + ":" + PORT_YARN;
+	public static final String DEFAULT_FS = "hdfs://" + HOST + ":" + PORT_HDFS;
+	public static final String DEFAULT_FS_INPUT = DEFAULT_FS + "/input";
 /**
  * Instance Hadoop Cluster
  * @return

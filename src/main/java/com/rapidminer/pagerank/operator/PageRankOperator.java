@@ -1,22 +1,20 @@
 package com.rapidminer.pagerank.operator;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
+import java.io.File;
+import java.io.OutputStream;
 import java.util.List;
 
-import com.rapidminer.example.Attributes;
-import com.rapidminer.example.Example;
 import com.rapidminer.example.ExampleSet;
 import com.rapidminer.operator.Operator;
 import com.rapidminer.operator.OperatorDescription;
 import com.rapidminer.operator.OperatorException;
+import com.rapidminer.operator.UserError;
 import com.rapidminer.operator.ports.InputPort;
 import com.rapidminer.operator.ports.OutputPort;
 import com.rapidminer.operator.ports.metadata.MetaData;
 import com.rapidminer.operator.ports.metadata.SimplePrecondition;
 import com.rapidminer.pagerank.pagerank.PageRankDriver;
-import com.rapidminer.pagerank.utilities.MaxtriHelper;
+import com.rapidminer.pagerank.utilities.HadoopUtilities;
 import com.rapidminer.parameter.ParameterType;
 import com.rapidminer.parameter.ParameterTypeDouble;
 import com.rapidminer.parameter.ParameterTypeInt;
@@ -33,6 +31,7 @@ public class PageRankOperator extends Operator {
 	public static final String PARAMETER_ADVANCED = "Advanced";
 	public static final String PARAMETER_DAMPING = "Damping factor";
 	public static final String PARAMETER_INTERATION = "Iteration factor";
+	public static final Boolean PARAMETER_CLUSTER = false;
 
 	public PageRankOperator(OperatorDescription description) {
 		super(description);
@@ -55,12 +54,37 @@ public class PageRankOperator extends Operator {
 		PageRankDriver.INTERATIONS = interaions;
 
 		ExampleSet exampleSet = input.getData(ExampleSet.class);
-		// save file - run on hadoop
-		saveFile(exampleSet);
-
+		// Save file to local - run Hadoop on local
+		if (!HadoopUtilities.saveExampleSetToFile(exampleSet)) {
+			throw new UserError(this, "301", "error save file");
+		}
 		ExampleSet exampleSetResult = null;
 		try {
-			exampleSetResult = MaxtriHelper.getDataHadoopCluster(PageRankDriver.RESULT_LOCAL);
+			if (PARAMETER_CLUSTER) {
+				if (!HadoopUtilities.writeHadoopCluster(PageRankDriver.INPUT_LOCAL, PageRankDriver.INPUT_CLUSTER)) {
+					throw new UserError(this, "301", "Update file to HDFS failed");
+				}
+				if (HadoopUtilities.runHadoopCluster()) {
+					if (!HadoopUtilities.checkFileExistHadoopCluster(PageRankDriver.RESULT_CLUSTER)) {
+						throw new UserError(this, "301", PageRankDriver.RESULT_CLUSTER);
+					}
+					exampleSetResult = HadoopUtilities.getDataHadoopCluster(PageRankDriver.RESULT_CLUSTER);
+				} else {
+					throw new UserError(this, "301", "Run Hadoop Cluster Failed");
+				}
+
+			} else {
+
+				if (HadoopUtilities.runHadoopLocal()) {
+					if (!new File(PageRankDriver.RESULT_LOCAL).exists()) {
+						throw new UserError(this, "301", PageRankDriver.RESULT_LOCAL);
+					}
+					exampleSetResult = HadoopUtilities.getDataHadoopLocal(PageRankDriver.RESULT_LOCAL);
+				} else {
+					throw new UserError(this, "301", "Run Hadoop Failed");
+				}
+			}
+
 			exampleSetResult.getAttributes().get("att1").setName("rank");
 			exampleSetResult.getAttributes().get("att2").setName("title");
 
@@ -93,37 +117,6 @@ public class PageRankOperator extends Operator {
 		types.add(interations);
 
 		return types;
-	}
-
-	public static void saveFile(ExampleSet exampleSet) {
-		String input = "D:/pageRank/input/input.txt";
-		Attributes attributes = exampleSet.getAttributes();
-		if (attributes.size() > 2) {
-			try {
-				FileOutputStream fos = new FileOutputStream(input);
-				OutputStreamWriter osw = new OutputStreamWriter(fos);
-				BufferedWriter bw = new BufferedWriter(osw);
-				for (Example item : exampleSet) {
-					String id = item.get("id").toString();
-					// String title = item.get("title").toString();
-					String outlink = item.get("outlink").toString();
-
-					if (outlink.equals("?")) {
-						outlink = "";
-					}
-
-					String line = id + "\t" + 1.0 + "\t" + outlink;
-					bw.write(line);
-					bw.newLine();
-				}
-				bw.flush();
-				bw.close();
-				PageRankDriver.INPUT_LOCAL = input;
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-			}
-		}
 	}
 
 }
