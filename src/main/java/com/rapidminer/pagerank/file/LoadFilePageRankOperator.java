@@ -59,7 +59,7 @@ import java.util.List;
 
 /**
  * @author Nils Woehler, Marius Helf
- * @editor Khanh Duy Kham
+ * 
  */
 public class LoadFilePageRankOperator extends Operator {
 
@@ -73,7 +73,7 @@ public class LoadFilePageRankOperator extends Operator {
 	public static final int SOURCE_TYPE_URL = 1;
 	public static final int SOURCE_TYPE_REPOSITORY = 2;
 
-	public OutputPort fileOutputPort = getOutputPorts().createPort("file");
+	private OutputPort fileOutputPort = getOutputPorts().createPort("file");
 
 	private List<File> myTempFiles = new LinkedList<File>();
 
@@ -140,6 +140,8 @@ public class LoadFilePageRankOperator extends Operator {
 				} else if (!(entry instanceof BlobEntry)) {
 					throw new UserError(this, "942", source, "blob", entry.getType());
 				}
+				break;
+			default:
 				break;
 			}
 		} catch (UndefinedParameterError e) {

@@ -39,6 +39,8 @@ public class PageRankDriver extends Configured implements Tool {
 		// System.exit(ToolRunner.run(new Configuration(), new PageRankDriver(),
 		// args));
 		runPageRankHadoopLocal();
+		//HadoopUtilities.copyFromLocalFileToHadoop(PageRankDriver.INPUT_LOCAL, PageRankDriver.INPUT_CLUSTER);
+		//runPageRankHadoopCluster();
 	}
 
 	@Override
@@ -70,7 +72,9 @@ public class PageRankDriver extends Configured implements Tool {
 	}
 
 	public static boolean runPageRankHadoopLocal() throws Exception {
-		Configuration conf = new YarnConfiguration();
+		Configuration conf = new Configuration();
+	//	conf.addResource(new Path("L:/hadoop/etc/hadoop/core-site.xml"));
+	//	conf.addResource(new Path("L:/hadoop/etc/hadoop/hdfs-site.xml"));
 		boolean isCompleted = false;
 		String lastResultPath = null;
 		String inPath = null;

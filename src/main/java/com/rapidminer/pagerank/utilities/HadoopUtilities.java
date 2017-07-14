@@ -72,6 +72,26 @@ public class HadoopUtilities {
 		}
 		return false;
 	}
+	
+	/**
+	 * Write data from local to hadoop cluster
+	 * 
+	 * @param path
+	 * @return
+	 * @throws Exception
+	 */
+	public static boolean copyFromLocalFileToHadoop(String src, String desc) throws Exception {
+		FileSystem fs = FileSystem.get(HadoopCluster.getConf());
+		Path pathLocal = new Path(src);
+		Path pathHadoop = new Path(desc);
+		if (fs.exists(pathHadoop)) {
+			fs.delete(pathHadoop, true);
+			fs.copyFromLocalFile(true, true, pathLocal, pathHadoop);
+			
+			return true;
+		}
+		return false;
+	}
 
 	/**
 	 * Delete folderPath from Hadoop cluster

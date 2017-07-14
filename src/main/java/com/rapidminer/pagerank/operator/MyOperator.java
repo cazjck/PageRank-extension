@@ -33,9 +33,8 @@ public class MyOperator extends Operator {
 	private OutputPort ouput = getOutputPorts().createPort("result");
 	public static final String PARAMETER_TEXT = "log text";
 	public static final String PARAMETER_USE_CUSTOM_TEXT = "use custom text";
-	/**
-	 * @param description
-	 */
+
+	
 	public MyOperator(OperatorDescription description) {
 		super(description);
 		MetaData desiredMetaData = new MetaData(ExampleSet.class);
