@@ -1,13 +1,17 @@
 package com.rapidminer.pagerank.utilities;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
+
+import javax.swing.text.StyledEditorKit.BoldAction;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -185,6 +189,23 @@ public class HadoopUtilities {
 			}
 		}
 		return false;
+	}
+	
+	public static Boolean runHadoop() throws Exception{
+		Process p = Runtime.getRuntime().exec("L:/hadoop/bin/hadoop.cmd jar D:/PageRankLocal.jar");
+		BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		String line = input.readLine();
+		while (line != null) {
+		  // process output of the task
+		  // ...
+		}
+		input.close();
+		// wait for the task complete
+		p.waitFor();
+
+		int ret = p.exitValue();
+		return null;
+
 	}
 
 	public static Boolean runHadoopLocal() throws InterruptedException, ExecutionException {

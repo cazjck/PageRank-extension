@@ -13,8 +13,12 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.hadoop.metrics2.lib.MutableMetric;
+import org.apache.hadoop.metrics2.lib.MutableMetricsFactory;
 import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
+import org.apache.log4j.PropertyConfigurator;
 
 import com.rapidminer.pagerank.utilities.HadoopCluster;
 import com.rapidminer.pagerank.utilities.HadoopUtilities;
@@ -22,30 +26,35 @@ import com.rapidminer.pagerank.utilities.HadoopUtilities;
 public class PageRankDriver extends Configured implements Tool {
 	private static NumberFormat nf = new DecimalFormat("00");
 	public static final String INPUT_LOCAL = HadoopUtilities.PATH_RAPIDMINER + "/extensions/workspace/input.txt";
-	public static final String OUTPUT__LOCAL = HadoopUtilities.PATH_RAPIDMINER + "/pageRank/ranking/iter";
-	public static final String RESULT_LOCAL = HadoopUtilities.PATH_RAPIDMINER + "/pageRank/result";
 	public static final String INPUT_CLUSTER = HadoopCluster.DEFAULT_FS + "/input/input.txt";
+	public static final String OUTPUT__LOCAL = HadoopUtilities.PATH_RAPIDMINER
+			+ "/extensions/workspace/pageRank/ranking/iter";
 	public static final String OUTPUT_CLUSTER = HadoopCluster.DEFAULT_FS + "/pageRank/ranking/iter";
+	public static final String RESULT_LOCAL = HadoopUtilities.PATH_RAPIDMINER + "/extensions/workspace/pageRank/result";
 	public static final String RESULT_CLUSTER = HadoopCluster.DEFAULT_FS + "/pageRank/result";
 	public static Double DAMPING = 0.85d;
-	public static int INTERATIONS = 1;
+	public static int INTERATIONS = 10;
 	public static Boolean CLUSTER = false;
 
 	public PageRankDriver() {
+	
+		
 	}
 
 	public static void main(String[] args) throws Exception {
 		// Test Hadoop on local
-		// System.exit(ToolRunner.run(new Configuration(), new PageRankDriver(),
-		// args));
+		// System.exit(ToolRunner.run(new Configuration(), new PageRankDriver(), args));
+		
+		//PropertyConfigurator.configure("D:/log4j.properties");
 		runPageRankHadoopLocal();
-		//HadoopUtilities.copyFromLocalFileToHadoop(PageRankDriver.INPUT_LOCAL, PageRankDriver.INPUT_CLUSTER);
-		//runPageRankHadoopCluster();
+		// HadoopUtilities.copyFromLocalFileToHadoop(PageRankDriver.INPUT_LOCAL,
+		// PageRankDriver.INPUT_CLUSTER);
+		// runPageRankHadoopCluster();
 	}
 
 	@Override
 	public int run(String[] args) throws Exception {
-		Configuration conf = new YarnConfiguration();
+		Configuration conf = new Configuration();
 		boolean isCompleted = false;
 
 		String lastResultPath = null;
@@ -71,10 +80,12 @@ public class PageRankDriver extends Configured implements Tool {
 		return 0;
 	}
 
+
 	public static boolean runPageRankHadoopLocal() throws Exception {
+		PropertyConfigurator.configure("D:/log4j.properties");
 		Configuration conf = new Configuration();
-	//	conf.addResource(new Path("L:/hadoop/etc/hadoop/core-site.xml"));
-	//	conf.addResource(new Path("L:/hadoop/etc/hadoop/hdfs-site.xml"));
+		// conf.addResource(new Path("L:/hadoop/etc/hadoop/core-site.xml"));
+		// conf.addResource(new Path("L:/hadoop/etc/hadoop/hdfs-site.xml"));
 		boolean isCompleted = false;
 		String lastResultPath = null;
 		String inPath = null;
@@ -100,6 +111,7 @@ public class PageRankDriver extends Configured implements Tool {
 	}
 
 	public static boolean runPageRankHadoopCluster() throws Exception {
+		PropertyConfigurator.configure("com/rapidminer/extension/resources/log4j.properties");
 		Configuration conf = HadoopCluster.getConf();
 		boolean isCompleted = false;
 		String lastResultPath = null;
@@ -129,9 +141,9 @@ public class PageRankDriver extends Configured implements Tool {
 
 		Job job = Job.getInstance(conf, "Rank Calculation");
 		job.setJarByClass(PageRankDriver.class);
-		job.setMapperClass(RankCalculateMapper.class);
-		job.setJar("jars/PageRankDriver.jar");// run in Hadoop cluster
-		job.setReducerClass(RankCalculateReduce.class);
+		job.setMapperClass(ProcessPageRankMapper1.class);
+		//job.setJar("D:/PageRankMapReduce.jar");// run in Hadoop cluster
+		job.setReducerClass(ProcessPageRankReducer1.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
 		HadoopUtilities.deleteFolderHadoopCluster(conf, outputPath);
@@ -145,7 +157,8 @@ public class PageRankDriver extends Configured implements Tool {
 
 		Job rankOrdering = Job.getInstance(conf, "Rank Ordeing");
 		rankOrdering.setJarByClass(PageRankDriver.class);
-		rankOrdering.setJar("jars/PageRankDriver.jar");
+		//rankOrdering.setJar("D:/PageRankMapReduce.jar");
+		//rankOrdering.setJar("jars/PageRankDriver.jar");
 		rankOrdering.setOutputKeyClass(FloatWritable.class);
 		rankOrdering.setOutputValueClass(Text.class);
 

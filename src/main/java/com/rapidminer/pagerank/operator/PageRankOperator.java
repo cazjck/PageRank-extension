@@ -1,9 +1,9 @@
 package com.rapidminer.pagerank.operator;
 
-import java.io.File;
-import java.io.OutputStream;
 import java.util.List;
 
+
+import com.mongodb.MapReduceOutput;
 import com.rapidminer.example.ExampleSet;
 import com.rapidminer.operator.Operator;
 import com.rapidminer.operator.OperatorDescription;
@@ -13,8 +13,8 @@ import com.rapidminer.operator.ports.InputPort;
 import com.rapidminer.operator.ports.OutputPort;
 import com.rapidminer.operator.ports.metadata.MetaData;
 import com.rapidminer.operator.ports.metadata.SimplePrecondition;
+import com.rapidminer.pagerank.pagerank.PageRank;
 import com.rapidminer.pagerank.pagerank.PageRankDriver;
-import com.rapidminer.pagerank.utilities.HadoopUtilities;
 import com.rapidminer.parameter.ParameterType;
 import com.rapidminer.parameter.ParameterTypeDouble;
 import com.rapidminer.parameter.ParameterTypeInt;
@@ -54,13 +54,14 @@ public class PageRankOperator extends Operator {
 		PageRankDriver.INTERATIONS = interaions;
 
 		ExampleSet exampleSet = input.getData(ExampleSet.class);
-		// Save file to local - run Hadoop on local
-		if (!HadoopUtilities.saveExampleSetToFile(exampleSet)) {
-			throw new UserError(this, "301", "error save file");
-		}
+		
 		ExampleSet exampleSetResult = null;
 		try {
-			if (PARAMETER_CLUSTER) {
+			// Save file to local - run Hadoop on local
+			if (!PageRank.saveCollection(exampleSet)) {
+				throw new UserError(this, "301", "error save file");
+			}
+			/*if (PARAMETER_CLUSTER) {
 				if (!HadoopUtilities.writeHadoopCluster(PageRankDriver.INPUT_LOCAL, PageRankDriver.INPUT_CLUSTER)) {
 					throw new UserError(this, "301", "Update file to HDFS failed");
 				}
@@ -74,19 +75,23 @@ public class PageRankOperator extends Operator {
 				}
 
 			} else {
-
-				if (HadoopUtilities.runHadoopLocal()) {
+				if (PageRankDriver.runPageRankHadoopLocal()) {
 					if (!new File(PageRankDriver.RESULT_LOCAL).exists()) {
 						throw new UserError(this, "301", PageRankDriver.RESULT_LOCAL);
 					}
 					exampleSetResult = HadoopUtilities.getDataHadoopLocal(PageRankDriver.RESULT_LOCAL);
 				} else {
-					throw new UserError(this, "301", "Run Hadoop Failed");
+					throw new UserError(this, "301", "Run Hadoop Failed:"+PageRankDriver.RESULT_LOCAL);
 				}
+			}*/
+			MapReduceOutput result;
+			if ((result = PageRank.runPageRank(10)) == null) {
+				throw new UserError(this, "301", "Page Rank - Map Reduce on MongoDB failed");
 			}
-
-			exampleSetResult.getAttributes().get("att1").setName("rank");
-			exampleSetResult.getAttributes().get("att2").setName("title");
+			exampleSetResult=PageRank.getDataPageRank(result);
+			exampleSetResult.getAttributes().get("att1").setName("ID");
+			exampleSetResult.getAttributes().get("att2").setName("Page Rank");
+			exampleSetResult.getAttributes().get("att3").setName("Links");
 
 		} catch (Exception e) {
 			e.printStackTrace();

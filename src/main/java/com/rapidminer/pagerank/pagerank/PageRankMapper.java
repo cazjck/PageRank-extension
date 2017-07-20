@@ -1,14 +1,15 @@
 package com.rapidminer.pagerank.pagerank;
 
-import java.io.IOException;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.log4j.Logger;
 
 /**
  * 
  * @author Pham Duy Khanh
  */
 public class PageRankMapper extends Mapper<Object, Text, Text, Text> {
+
 	/**
 	 * The `map(...)` method is executed against each item in the input split. A
 	 * key-value pair is mapped to another, intermediate, key-value pair.
@@ -22,64 +23,34 @@ public class PageRankMapper extends Mapper<Object, Text, Text, Text> {
 	 * Note: Remember that the pagerank calculation MapReduce job will run
 	 * multiple times, as the pagerank will get more accurate with each
 	 * iteration. You should preserve each page's list of links.
-	 *
-	 * @param key
-	 *            the key associated with each item output from
-	 *            {@link uk.ac.ncl.cs.csc8101.hadoop.parse.PageLinksParseReducer
-	 *            PageLinksParseReducer}
-	 * @param value
-	 *            the text value "[page] [initialPagerank]
-	 *            outLinkA,outLinkB,outLinkC..."
-	 * @param context
-	 *            Mapper context object, to which key-value pairs are written
-	 * @throws IOException
-	 * @throws InterruptedException
 	 */
-
+	private static final Logger LOG = Logger.getLogger(PageRankMapper.class);
 	public void map(Object key, Text value, Context context) {
 		try {
 			int pageTabIndex = value.find("\t");
 			int rankTabIndex = value.find("\t", pageTabIndex + 1);
 
-			// Gets the string of the value
-			// Gets the mapped page
-			String id = Text.decode(value.getBytes(), 0, pageTabIndex);
-			// Get title
-			String title = Text.decode(value.getBytes(), pageTabIndex+1, rankTabIndex + 1);
-			String page = id + "|" + title;
-			// get array outlinks
-			// Gets the [thisPage] [thisPagesRank]
-			String mappedPageStr = page + "\t" + 1.0;
-			context.write(new Text(page), new Text("!"));
+			String page = Text.decode(value.getBytes(), 0, pageTabIndex);
+			String pageWithRank = Text.decode(value.getBytes(), 0, rankTabIndex + 1);
+			String links = Text.decode(value.getBytes(), rankTabIndex + 1, value.getLength() - (rankTabIndex + 1));
+
 			// Skip pages with no links.
-			if (rankTabIndex == -1)
+			if (rankTabIndex == -1 || links.isEmpty()) {
+				// Mark page as an Existing page (ignore red wiki-links)
+				context.write(new Text(page), new Text("*****"));
 				return;
-			String outLinks = Text.decode(value.getBytes(), rankTabIndex + 1, value.getLength() - (rankTabIndex + 1));
-			// Mark page as an Existing page (ignore red wiki-links)
-
-			// Ignore if page not enough property
-			// Ignore if page contains no links
-			/*
-			 * if (sections.length < 3 || outLinks.equals("?")) {
-			 * context.write(new Text(id), new
-			 * Text(PageRankDriver.LINKS_SEPARATOR + title + "\t" + "?"));
-			 * return; // Mark page as an Existing page (ignore red wiki-links)
-			 * context.write(new Text(page), new Text("! ")); return; }
-			 */
-
-			// Gets the linked pages and [thisTotalNumberOfLinks]
-			String[] allOtherPages = outLinks.split(",");
-			int total = allOtherPages.length;
-
-			// For each linked to page, store [thisPage] [thisPagesRank]
-			// [thisTotalNumberOfLinks]
-			for (String otherPage : allOtherPages) {
-				context.write(new Text(otherPage), new Text(mappedPageStr + "\t" + total));
 			}
 
-			// Adds original links for preservation
-			context.write(new Text(page), new Text("|" + outLinks));
+			String[] allOtherPages = links.split(",");
+			int totalLinks = allOtherPages.length;
 
+			for (String otherPage : allOtherPages) {
+				Text pageRankTotalLinks = new Text(pageWithRank + totalLinks);
+				context.write(new Text(otherPage), pageRankTotalLinks);
+			}
+
+			// Put the original links of the page for the reduce output
+			context.write(new Text(page), new Text("*****" + links));
 		} catch (Exception e) {
 			System.out.println(value.toString());
 		}

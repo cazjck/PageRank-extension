@@ -12,6 +12,9 @@ plugins { id 'com.rapidminer.extension' version '0.9.2' }
 repositories {
     jcenter()
 	maven { url 'https://maven.rapidminer.com/content/groups/public/' }
+	flatDir {
+            dirs "$rootProject.projectDir/libs"
+        }
 }
 
 extensionConfig {
@@ -61,10 +64,14 @@ dependencies {
 	compile "org.apache.hadoop:hadoop-yarn-client:2.7.3"
 	compile "org.apache.hadoop:hadoop-yarn:2.7.3"
 	compile "org.apache.hadoop:hadoop-common:2.7.3"
-	// https://mvnrepository.com/artifact/org.apache.commons/commons-collections4
-	compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
+	compile group: 'org.mongodb', name: 'mongo-java-driver', version: '3.2.2'
+	// https://mvnrepository.com/artifact/log4j/log4j
+	compile group: 'log4j', name: 'log4j', version: '1.2.17'
+
+
 	
 }
+
 task makeWrapper(type: Wrapper) {
     gradleVersion = '2.14.1'
 }

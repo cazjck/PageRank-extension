@@ -2,6 +2,7 @@ package com.rapidminer.pagerank.pagerank;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
@@ -39,46 +40,35 @@ public class PageRankReducer extends Reducer<Text, Text, Text, Text> {
 	 * @throws InterruptedException
 	 */
 	private static Double damping = 0.85d;
-
+	private static final Logger LOG = Logger.getLogger(PageRankReducer.class);
 	@Override
 	public void reduce(Text page, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-		String s = null;
-		try {
-			boolean isExistingWikiPage = false;
-			float sumShareOtherPageRanks = 0;
-			String links = "";
-			for (Text value : values) {
-				String pageStr = value.toString();
-				s = pageStr;
-				if (pageStr.equals("!")) {
-					isExistingWikiPage = true;
-					continue;
-				}
-				// If it is a links record, add it to the links array
-				if (pageStr.startsWith("|")) {
-					links = pageStr.substring(1);
-					continue;
-				}
-				// If it is a normal record however
-				// Find the pagerank and number of links for the given page
-				String[] sections = pageStr.split("\t");
-				float currentPageRank = Float.valueOf(sections[1]);
-				int countOutLinks = Integer.valueOf(sections[2]);
-
-				// Add the given pagerank to the running total for the other
-				// pages
-				sumShareOtherPageRanks += (currentPageRank / countOutLinks);
+		double pageRk = 0;
+		String preserveLinks = "";
+		for (Text curr : values) {
+			String value = curr.toString();
+			// If it is a links ***** record, preserve the links
+			if (value.startsWith("*")) {
+				preserveLinks = value.substring(value.lastIndexOf("*") + 1);
+				LOG.info("Preserved links only" + preserveLinks);
 			}
-			if (!isExistingWikiPage)
-				return;
-			// Calculate pagerank by applying the dampening to the sum
-			double newRank = (1 - damping) + (damping * sumShareOtherPageRanks);
-
+			// If it is a normal record, compute the page rank
+			else {
+				String[] splits = value.split("\\t"); // Find the page rank and number of links for the given page
+				double currentPageRank = Double.valueOf(splits[1]);
+				int linkCount = Integer.valueOf(splits[2]);
+				pageRk += currentPageRank / linkCount; // Sum all the in links and divide by the out degree
+			}
+		}
+		/*
+		 * condition to avoid writing the page rank values for the documents not
+		 * present in the corpus
+		 */
+		if (preserveLinks != "") {
+			// Calculate page rank by applying the damping factor to the sum
+			double pageRank = (1 - damping) + damping * pageRk;
 			// Add new pagerank to total
-			context.write(page, new Text(newRank + "\t" + links));
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println(s);
+			context.write(page, new Text(pageRank + "\t" + preserveLinks));
 		}
 
 	}
