@@ -67,7 +67,7 @@ public class PageRankOperator extends Operator {
 		
 		ExampleSet exampleSetResult = null;
 		try {
-			// Save file to local - run Hadoop on local
+			// Save Example Set to MongoDB
 			if (!PageRankMongoDB.saveCollection(exampleSet)) {
 				throw new UserError(this, "301", "error save file");
 			}

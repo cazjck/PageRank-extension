@@ -1,7 +1,7 @@
 package com.rapidminer.pagerank.mongodb;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.HashMap;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -10,14 +10,12 @@ import com.mongodb.DBObject;
 import com.mongodb.MapReduceCommand;
 import com.mongodb.MapReduceCommand.OutputType;
 import com.mongodb.MapReduceOutput;
-import com.mongodb.MongoClient;
 import com.rapidminer.example.Example;
 import com.rapidminer.example.ExampleSet;
 import com.rapidminer.example.ExampleSetFactory;
 import com.rapidminer.pagerank.utilities.MaxtriHelper;
 
 public class PageRankMongoDB {
-	private static MongoClient mongoClient;
 	private static final String DATABASE_PAGERANK = "pagerank";
 	private static final String COLLECTION_PAGERANK = "pages";
 	private static final String URL = "URL";
@@ -31,20 +29,23 @@ public class PageRankMongoDB {
 		 * reduce).collectionName("pages").action(MapReduceAction.REPLACE).
 		 * nonAtomic(false) .sharded(false);
 		 */
-		 //runPageRank(1);
-		//ExampleSet ExampleSet = getDataPageRank(runPageRank(1));
+		runPageRank(10, 0.85);
+		// ExampleSet ExampleSet = getDataPageRank(runPageRank(1));
 		// saveCollection(ExampleSet);
 	}
 
-	public static MapReduceOutput runMapReduce(DBCollection collection,Double damping) {
-		String map = "function () {" 
-				+ " if(this.value.OutLinks != null){										\n"
-				+ " 	for (var i = 0, len = this.value.OutLinks.length; i < len; i++) {	\n"
-				+ " 		emit(this.value.OutLinks[i], this.value.PageRank / len); 	\n"
-				+ " 	}																\n"
-				+ "}																	\n"
-				+ " 	emit(this.value.URL, 0);										\n"
-				+ " 	emit(this.value.URL, this.value.OutLinks);						\n"
+	public static MapReduceOutput runMapReduce(DBCollection collection, Double damping) {
+		HashMap<String, Object> scope = new HashMap<>();
+		scope.put("DAMPING", damping);
+		String map = "function () {" + " 	if(this.value.OutLinks != null){					\n"
+				+ " 		for (var i = 0, len = this.value.OutLinks.length; i < len; i++) {	\n"
+				+ " 			emit(this.value.OutLinks[i], this.value.PageRank / len); 		\n"
+				+ " 		}																	\n"
+				+ " 	}																		\n"
+				+ " 	if( this.value.URL != null){											\n"
+				+ " 		emit(this.value.URL, 0);											\n"
+				+ " 		emit(this.value.URL, this.value.OutLinks);							\n"
+				+ "		}																		\n"
 				+ " }; 																	";
 		String reduce = "function (k, vals) {											\n"
 				+ "	var links = [];														\n"
@@ -55,19 +56,16 @@ public class PageRankMongoDB {
 				+ "  		else														\n"
 				+ " 			pagerank += vals[i];									\n"
 				+ "  	}																\n"
-				+ "	pagerank = 1 - 0.85 + 0.85 * pagerank;								\n"
+				+ "	pagerank = 1 - DAMPING + DAMPING * pagerank;						\n"
 				+ " 	return { URL: k, PageRank: pagerank, OutLinks: links };			\n"
 				+ "};																	";
+		MapReduceCommand mapReduceCommand = new MapReduceCommand(collection, map, reduce, COLLECTION_PAGERANK,
+				OutputType.REPLACE, null);
+		 mapReduceCommand.setScope(scope);
+		MapReduceOutput out = collection.mapReduce(mapReduceCommand);
 
-		MapReduceOutput out = collection.mapReduce(
-				new MapReduceCommand(collection, map, reduce, COLLECTION_PAGERANK, OutputType.REPLACE, null));
-		
-		System.out.println(out.getDuration());
-		if (out.results() != null) {
-			System.out.println("Mapreduce results");
-		} else {
-			System.out.println("Mapreduce failed");
-		}
+		System.out.println("Duration:" + out.getDuration());
+
 		return out;
 	}
 
@@ -78,25 +76,26 @@ public class PageRankMongoDB {
 		if (result.results() != null) {
 
 			for (DBObject o : result.results()) {
-				Object obj = o.get("value");
-				try {
-					if (! (obj instanceof Double)) {
-						DBObject dbObject = (DBObject) obj;
-						arrayList2.add(dbObject.get(URL).toString());
-						arrayList2.add(dbObject.get(PAGERANK).toString());
-						arrayList2.add(dbObject.get(OUTLINKS).toString());
+				if (o != null) {
+					Object obj = o.get("value");
+					try {
+						if (!(obj instanceof Double)) {
+							DBObject dbObject = (DBObject) obj;
+							arrayList2.add(dbObject.get(URL).toString());
+							arrayList2.add(dbObject.get(PAGERANK).toString());
+							arrayList2.add(dbObject.get(OUTLINKS).toString());
+						} else {
+							arrayList2.add(o.get("_id").toString());
+							arrayList2.add(o.get("value").toString());
+							arrayList2.add("URL not contain in this DataSet");
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+						System.out.println(o.toString());
 					}
-					else {
-						arrayList2.add(o.get("_id").toString());
-						arrayList2.add(o.get("value").toString());
-						arrayList2.add("");
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					System.out.println(o.toString());
+					arrayList.add((ArrayList<String>) arrayList2.clone());
+					arrayList2.clear();
 				}
-				arrayList.add((ArrayList<String>) arrayList2.clone());
-				arrayList2.clear();
 			}
 
 		}
@@ -110,18 +109,15 @@ public class PageRankMongoDB {
 		return exampleSetResult;
 	}
 
-	public static MapReduceOutput runPageRank(int teration, Double damping) {
-		mongoClient = new MongoClient("localhost", 27017);
+	public static MapReduceOutput runPageRank(int iteration, Double damping) {
 		@SuppressWarnings("deprecation")
-		DB data = mongoClient.getDB(DATABASE_PAGERANK);
+		DB data = MongoConfig.getInstance().getDB(DATABASE_PAGERANK);
 		DBCollection page = data.getCollection(COLLECTION_PAGERANK);
-		@SuppressWarnings("unused")
-
 		MapReduceOutput out = null;
-		for (int i = 0; i < 1; i++) {
-			out = runMapReduce(page,damping);
+		for (int i = 1; i <= iteration; i++) {
+			out = runMapReduce(page, damping);
 			if (out.results() != null) {
-				System.out.println("Success");
+				System.out.println("Interation times:" + i);
 			}
 		}
 		return out;
@@ -129,9 +125,8 @@ public class PageRankMongoDB {
 
 	public static boolean saveCollection(ExampleSet exampleSet) {
 		try {
-			mongoClient = new MongoClient("localhost", 27017);
 			@SuppressWarnings("deprecation")
-			DB db = mongoClient.getDB("pagerank");
+			DB db = MongoConfig.getInstance().getDB("pagerank");
 			if (db.getCollection(COLLECTION_PAGERANK) != null) {
 				db.getCollection(COLLECTION_PAGERANK).drop();
 			}
@@ -156,18 +151,6 @@ public class PageRankMongoDB {
 		String[] links = null;
 		// is empty
 		if (!outlink.equals("?")) {
-			links = outlink.split(",");
-		}
-		newDoc.append("value",
-				new BasicDBObject(URL, item.get(URL).toString()).append(PAGERANK, 1.0).append(OUTLINKS, links));
-		return newDoc;
-	}
-
-	public static BasicDBObject createDocumentCopy(Example item) {
-		BasicDBObject newDoc = new BasicDBObject();
-		String outlink = item.get(OUTLINKS).toString();
-		String[] links = null;
-		if (!(outlink.equals("?") || outlink.isEmpty())) {
 			links = outlink.split(",");
 		}
 		newDoc.append("value",
