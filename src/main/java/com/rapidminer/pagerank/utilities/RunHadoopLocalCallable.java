@@ -3,7 +3,7 @@ package com.rapidminer.pagerank.utilities;
 
 import java.util.concurrent.Callable;
 
-import com.rapidminer.pagerank.pagerank.PageRankDriver;
+import com.rapidminer.pagerank.hadoop.PageRankDriver;
 
 
 public class RunHadoopLocalCallable implements Callable<Boolean> {

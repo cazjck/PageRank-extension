@@ -10,7 +10,7 @@ import org.apache.hadoop.fs.Path;
 
 import com.rapidminer.example.ExampleSet;
 import com.rapidminer.example.ExampleSetFactory;
-import com.rapidminer.pagerank.pagerank.PageRankDriver;
+import com.rapidminer.pagerank.hadoop.PageRankDriver;
 
 /**
  * 

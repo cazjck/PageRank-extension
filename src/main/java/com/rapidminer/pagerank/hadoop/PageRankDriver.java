@@ -1,4 +1,4 @@
-package com.rapidminer.pagerank.pagerank;
+package com.rapidminer.pagerank.hadoop;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;

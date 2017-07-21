@@ -1,4 +1,4 @@
-package com.rapidminer.pagerank.pagerank;
+package com.rapidminer.pagerank.hadoop;
 
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.LongWritable;

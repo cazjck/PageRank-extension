@@ -19,7 +19,7 @@ import com.rapidminer.operator.ports.InputPort;
 import com.rapidminer.operator.ports.OutputPort;
 import com.rapidminer.operator.ports.metadata.MetaData;
 import com.rapidminer.operator.ports.metadata.SimplePrecondition;
-import com.rapidminer.pagerank.pagerank.PageRankDriver;
+import com.rapidminer.pagerank.hadoop.PageRankDriver;
 import com.rapidminer.pagerank.utilities.HadoopUtilities;
 import com.rapidminer.pagerank.utilities.MaxtriHelper;
 import com.rapidminer.parameter.ParameterType;
