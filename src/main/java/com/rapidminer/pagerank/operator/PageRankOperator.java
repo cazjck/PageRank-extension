@@ -11,13 +11,19 @@ import com.rapidminer.operator.OperatorException;
 import com.rapidminer.operator.UserError;
 import com.rapidminer.operator.ports.InputPort;
 import com.rapidminer.operator.ports.OutputPort;
+import com.rapidminer.operator.ports.metadata.AttributeMetaData;
+import com.rapidminer.operator.ports.metadata.ExampleSetMetaData;
+import com.rapidminer.operator.ports.metadata.ExampleSetPassThroughRule;
 import com.rapidminer.operator.ports.metadata.MetaData;
+import com.rapidminer.operator.ports.metadata.SetRelation;
 import com.rapidminer.operator.ports.metadata.SimplePrecondition;
-import com.rapidminer.pagerank.pagerank.PageRank;
+import com.rapidminer.pagerank.mongodb.PageRankMongoDB;
 import com.rapidminer.pagerank.pagerank.PageRankDriver;
 import com.rapidminer.parameter.ParameterType;
 import com.rapidminer.parameter.ParameterTypeDouble;
 import com.rapidminer.parameter.ParameterTypeInt;
+import com.rapidminer.parameter.UndefinedParameterError;
+import com.rapidminer.tools.Ontology;
 
 /**
  * 
@@ -38,9 +44,13 @@ public class PageRankOperator extends Operator {
 		MetaData desiredMetaData = new MetaData(ExampleSet.class);
 		SimplePrecondition simplePrecondition = new SimplePrecondition(input, desiredMetaData);
 		input.addPrecondition(simplePrecondition);
-		getTransformer().addPassThroughRule(input, output);
-		// ChangeAttributeName changeAttributeName=new
-		// ChangeAttributeName(getOperatorDescription());
+		getTransformer().addRule(new ExampleSetPassThroughRule(input, output, SetRelation.EQUAL) {
+			@Override
+			public ExampleSetMetaData modifyExampleSet(ExampleSetMetaData metaData) throws UndefinedParameterError {
+				metaData.addAttribute(new AttributeMetaData("PageRank", Ontology.REAL));
+				return super.modifyExampleSet(metaData);
+			}
+		});
 
 	}
 
@@ -58,7 +68,7 @@ public class PageRankOperator extends Operator {
 		ExampleSet exampleSetResult = null;
 		try {
 			// Save file to local - run Hadoop on local
-			if (!PageRank.saveCollection(exampleSet)) {
+			if (!PageRankMongoDB.saveCollection(exampleSet)) {
 				throw new UserError(this, "301", "error save file");
 			}
 			/*if (PARAMETER_CLUSTER) {
@@ -85,13 +95,11 @@ public class PageRankOperator extends Operator {
 				}
 			}*/
 			MapReduceOutput result;
-			if ((result = PageRank.runPageRank(10)) == null) {
+			if ((result = PageRankMongoDB.runPageRank(interaions,damping)) == null) {
 				throw new UserError(this, "301", "Page Rank - Map Reduce on MongoDB failed");
 			}
-			exampleSetResult=PageRank.getDataPageRank(result);
-			exampleSetResult.getAttributes().get("att1").setName("ID");
-			exampleSetResult.getAttributes().get("att2").setName("Page Rank");
-			exampleSetResult.getAttributes().get("att3").setName("Links");
+			exampleSetResult=PageRankMongoDB.getDataPageRank(result);
+			
 
 		} catch (Exception e) {
 			e.printStackTrace();
