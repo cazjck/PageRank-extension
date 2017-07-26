@@ -13,7 +13,7 @@ import com.mongodb.MapReduceOutput;
 import com.rapidminer.example.Example;
 import com.rapidminer.example.ExampleSet;
 import com.rapidminer.example.ExampleSetFactory;
-import com.rapidminer.pagerank.utilities.MaxtriHelper;
+import com.rapidminer.pagerank.hadoop.utilities.MaxtriHelper;
 
 public class MongoDBPageRank {
 	private static final String DATABASE_PAGERANK = "pagerank";

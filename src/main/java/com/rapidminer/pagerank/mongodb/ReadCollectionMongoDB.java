@@ -54,17 +54,18 @@ public class ReadCollectionMongoDB extends MongoDBConnector {
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	public void doOperations(MongoClient mongoClient) throws OperatorException {
+	public void doOperations(MongoClient mongoClient,MongoDatabase db) throws OperatorException {
 		MongoCollection<org.bson.Document> collection = null;
 		FindIterable<org.bson.Document> cursor = null;
 		try {
 			final String collectionName = this.getParameter("collection");
-			final String databaseName = this.getParameter("database");
+/*			final String databaseName = this.getParameter("database");
 			if (!MongoDBUtils.databaseExists(mongoClient, databaseName)) {
 				throw new UserError((Operator) this, "nosql.mongodb.collection_does_not_exist",
 						new Object[] { databaseName });
-			}
-			MongoDatabase db=mongoClient.getDatabase(databaseName);
+			}*/
+			//MongoDatabase db=mongoClient.getDatabase(databaseName);
+		//	MongoDatabase db=mon
 			if (!MongoDBUtils.collectionExists(db, collectionName)) {
 				throw new UserError((Operator) this, "nosql.mongodb.collection_does_not_exist",
 						new Object[] { collectionName });

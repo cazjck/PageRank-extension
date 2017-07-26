@@ -16,8 +16,8 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.log4j.PropertyConfigurator;
 
-import com.rapidminer.pagerank.utilities.HadoopCluster;
-import com.rapidminer.pagerank.utilities.HadoopUtilities;
+import com.rapidminer.pagerank.hadoop.utilities.HadoopCluster;
+import com.rapidminer.pagerank.hadoop.utilities.HadoopUtilities;
 
 public class PageRankDriver extends Configured implements Tool {
 	private static NumberFormat nf = new DecimalFormat("00");

@@ -33,7 +33,7 @@ import com.rapidminer.operator.nio.file.SimpleFileObject;
 import com.rapidminer.operator.ports.OutputPort;
 import com.rapidminer.operator.ports.metadata.GenerateNewMDRule;
 import com.rapidminer.operator.ports.metadata.MDTransformationRule;
-import com.rapidminer.pagerank.utilities.HadoopUtilities;
+import com.rapidminer.pagerank.hadoop.utilities.HadoopUtilities;
 import com.rapidminer.parameter.ParameterType;
 import com.rapidminer.parameter.ParameterTypeCategory;
 import com.rapidminer.parameter.ParameterTypeFile;

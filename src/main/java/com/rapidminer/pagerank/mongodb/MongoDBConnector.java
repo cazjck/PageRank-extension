@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.util.JSONParseException;
 import com.rapidminer.operator.Operator;
 import com.rapidminer.operator.OperatorDescription;
@@ -31,21 +32,22 @@ public abstract class MongoDBConnector extends Operator {
 	        try {
 	            mongoDBInstanceName = this.getParameterAsString("mongodb_pagerank_instance");
 	             MongoDBConfigurable mongoDBInstanceConfigurable = (MongoDBConfigurable)ConfigurationManager.getInstance().lookup("mongodb_pagerank_instance", mongoDBInstanceName, (RepositoryAccessor)null);
-	            doOperations(mongoDBInstanceConfigurable.getInstance());
+	            MongoDatabase db=mongoDBInstanceConfigurable.getConnection();
+	             doOperations(mongoDBInstanceConfigurable.getInstance(),db);
 	        }
 	        catch (ConfigurationException e) {
-	            throw new UserError((Operator)this, (Throwable)e, "nosql.mongodb.configuration_exception", new Object[] { mongoDBInstanceName });
+	            throw new UserError((Operator)this, (Throwable)e, "pagerank.mongodb.configuration_exception", new Object[] { mongoDBInstanceName });
 	        }
 	        catch (IllegalArgumentException | JSONParseException ex2) {
 	            final RuntimeException ex = null;
 	            final RuntimeException e2 = ex;
-	            throw new UserError((Operator)this, (Throwable)e2, "nosql.mongodb.invalid_json_object");
+	            throw new UserError((Operator)this, (Throwable)e2, "pagerank.mongodb.invalid_json_object");
 	        }
 	        catch (MongoException e3) {
-	            throw new UserError((Operator)this, (Throwable)new MongoExceptionWrapper(e3), "nosql.mongodb.mongo_exception");
+	            throw new UserError((Operator)this, (Throwable)new MongoExceptionWrapper(e3), "pagerank.mongodb.mongo_exception");
 	        }
 	}
-	 public abstract void doOperations(final MongoClient mongoClient) throws OperatorException;
+	 public abstract void doOperations(final MongoClient mongoClient,MongoDatabase db) throws OperatorException;
 	 
 	 public List<ParameterType> getParameterTypes() {
 	        final List<ParameterType> parameterTypes = (List<ParameterType>)super.getParameterTypes();

@@ -1,4 +1,4 @@
-package com.rapidminer.pagerank.utilities;
+package com.rapidminer.pagerank.hadoop.utilities;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
