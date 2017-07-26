@@ -11,10 +11,21 @@
               <icon>add.png</icon>          
            </operator>
            <operator>
-              <key>PageRank_Key</key>
+              <key>PageRank_Hadoop_Key</key>
               <class>com.rapidminer.pagerank.operator.PageRankOperator</class>
               <icon>pageRank.png</icon>          
            </operator>
+           <operator>
+              <key>PageRank_MongoDB_Key</key>
+              <class>com.rapidminer.pagerank.operator.PageRankExampleSetOperator</class>
+              <icon>pageRank.png</icon>          
+           </operator>
+           <operator>
+              <key>PageRank_MongoDBCollection_Key</key>
+              <class>com.rapidminer.pagerank.mongodb.ReadCollectionMongoDB</class>
+              <icon>pageRank.png</icon>          
+           </operator>
+           
            
            <operator>
               <key>PageRank_File_Key</key>

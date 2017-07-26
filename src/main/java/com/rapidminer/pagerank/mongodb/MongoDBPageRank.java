@@ -15,7 +15,7 @@ import com.rapidminer.example.ExampleSet;
 import com.rapidminer.example.ExampleSetFactory;
 import com.rapidminer.pagerank.utilities.MaxtriHelper;
 
-public class PageRankMongoDB {
+public class MongoDBPageRank {
 	private static final String DATABASE_PAGERANK = "pagerank";
 	private static final String COLLECTION_PAGERANK = "pages";
 	private static final String URL = "URL";
@@ -29,7 +29,7 @@ public class PageRankMongoDB {
 		 * reduce).collectionName("pages").action(MapReduceAction.REPLACE).
 		 * nonAtomic(false) .sharded(false);
 		 */
-		runPageRank(10, 0.85);
+		//runPageRank(10, 0.85);
 		// ExampleSet ExampleSet = getDataPageRank(runPageRank(1));
 		// saveCollection(ExampleSet);
 	}
@@ -71,8 +71,8 @@ public class PageRankMongoDB {
 
 	@SuppressWarnings("unchecked")
 	public static ExampleSet getDataPageRank(MapReduceOutput result) {
-		ArrayList<ArrayList<String>> arrayList = new ArrayList<>();
-		ArrayList<String> arrayList2 = new ArrayList<>();
+		ArrayList<ArrayList<Object>> arrayList = new ArrayList<>();
+		ArrayList<Object> arrayList2 = new ArrayList<>();
 		if (result.results() != null) {
 
 			for (DBObject o : result.results()) {
@@ -82,26 +82,26 @@ public class PageRankMongoDB {
 						if (!(obj instanceof Double)) {
 							DBObject dbObject = (DBObject) obj;
 							arrayList2.add(dbObject.get(URL).toString());
-							arrayList2.add(dbObject.get(PAGERANK).toString());
+							arrayList2.add(dbObject.get(PAGERANK));
 							arrayList2.add(dbObject.get(OUTLINKS).toString());
 						} else {
 							arrayList2.add(o.get("_id").toString());
-							arrayList2.add(o.get("value").toString());
+							arrayList2.add(o.get("value"));
 							arrayList2.add("URL not contain in this DataSet");
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						System.out.println(o.toString());
 					}
-					arrayList.add((ArrayList<String>) arrayList2.clone());
+					arrayList.add((ArrayList<Object>) arrayList2.clone());
 					arrayList2.clear();
 				}
 			}
 
 		}
-
+		// after load data , delete collection
 		// result.drop();
-		String[][] array2D = MaxtriHelper.convert2DString1(arrayList);
+		Object[][] array2D = MaxtriHelper.convert2DObject(arrayList);
 		ExampleSet exampleSetResult = ExampleSetFactory.createExampleSet(array2D);
 		exampleSetResult.getAttributes().get("att1").setName(URL);
 		exampleSetResult.getAttributes().get("att2").setName(PAGERANK);

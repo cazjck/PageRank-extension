@@ -2,7 +2,6 @@ package com.rapidminer.pagerank.hadoop;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.log4j.Logger;
 
 /**
  * 
@@ -24,7 +23,6 @@ public class PageRankMapper extends Mapper<Object, Text, Text, Text> {
 	 * multiple times, as the pagerank will get more accurate with each
 	 * iteration. You should preserve each page's list of links.
 	 */
-	private static final Logger LOG = Logger.getLogger(PageRankMapper.class);
 	public void map(Object key, Text value, Context context) {
 		try {
 			int pageTabIndex = value.find("\t");

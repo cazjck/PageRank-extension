@@ -20,7 +20,10 @@
  */
 package com.rapidminer.pagerank;
 
+
 import com.rapidminer.gui.MainFrame;
+import com.rapidminer.pagerank.mongodb.config.MongoDBConfigurator;
+import com.rapidminer.tools.config.ConfigurationManager;
 
 
 /**
@@ -34,6 +37,7 @@ public final class PluginInitPageRank {
 
 		private PluginInitPageRank() {
 				// Utility class constructor
+			 
 		}
 
 		/**
@@ -41,7 +45,10 @@ public final class PluginInitPageRank {
 		 * hook during start up. No initialization of the operators or renderers has taken place when
 		 * this is called.
 		 */
-		public static void initPlugin() {}
+		public static void initPlugin() {
+			
+			 ConfigurationManager.getInstance().register(new MongoDBConfigurator());
+		}
 
 		/**
 		 * This method is called during start up as the second hook. It is called before the gui of the
@@ -68,4 +75,16 @@ public final class PluginInitPageRank {
 		 * a result of a historical typo, so it's a little bit misleading.
 		 */
 		public static void initPluginManager() {}
+
+		/*public static void verifyInstallation() {
+	        try {
+	            JarVerifier.verify(new Class[] { LicenseManagerRegistry.INSTANCE.get().getClass(), RapidMiner.class, PluginInitPageRank.class, PluginInitProfessional.class });
+	        }
+	        catch (GeneralSecurityException e) {
+	            throw new RuntimeException(e);
+	        }
+	    }
+		  static {
+		        verifyInstallation();
+		    }*/
 }

@@ -29,6 +29,14 @@ public class MaxtriHelper {
 		return array2D;
 	}
 
+	public static Object[][] convert2DObject(ArrayList<ArrayList<Object>> arrayList) {
+		Object[][] array2D = new Object[arrayList.size()][];
+		for (int i = 0; i < array2D.length; i++) {
+			ArrayList<Object> row = arrayList.get(i);
+			array2D[i] = row.toArray(new Object[row.size()]);
+		}
+		return array2D;
+	}
 	public static String[][] convert2DString1(ArrayList<ArrayList<String>> arrayList) {
 		String[][] array2D = new String[arrayList.size()][];
 		for (int i = 0; i < array2D.length; i++) {

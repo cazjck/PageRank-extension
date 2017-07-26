@@ -49,13 +49,19 @@ extensionConfig {
     // define RapidMiner version and extension dependencies
     dependencies {
         rapidminer '7.4.0'
-        //extension namespace: 'text', version: '7.4.1'
+      //  extension namespace: 'text', version: '7.4.1'
+    
     }
 }
 
 // Define third party library dependencies
 dependencies {
 	//compile 'com.google.guava:guava:18.0'
+	
+	compile files('C:/Users/cazjc/.RapidMiner/managed/rmx_text-7.5.0.jar')
+	//compile files('C:/Users/cazjc/.RapidMiner/managed/rmx_nosql-7.5.0.jar')
+	//compile files('D:/Program Files/RapidMiner Studio/lib/plugins/rapidminer-extension-professional-7.5.3-all.jar')
+	
 	compile "org.apache.hadoop:hadoop-hdfs:2.7.3"
 	compile "org.apache.hadoop:hadoop-client:2.7.3"
 	compile "org.apache.hadoop:hadoop-mapreduce-client-core:2.7.3"
@@ -64,7 +70,11 @@ dependencies {
 	compile "org.apache.hadoop:hadoop-yarn-client:2.7.3"
 	compile "org.apache.hadoop:hadoop-yarn:2.7.3"
 	compile "org.apache.hadoop:hadoop-common:2.7.3"
-	compile group: 'org.mongodb', name: 'mongo-java-driver', version: '3.2.2'
+	
+	compile 'org.mongodb:mongodb-driver:3.2.2'
+	compile 'org.mongodb:mongo-java-driver:3.2.2'
+	compile 'org.mongodb:mongodb-driver-async:3.2.2'
+	compile 'org.mongodb:mongodb-driver-core:3.2.2'
 	// https://mvnrepository.com/artifact/log4j/log4j
 	compile group: 'log4j', name: 'log4j', version: '1.2.17'
 

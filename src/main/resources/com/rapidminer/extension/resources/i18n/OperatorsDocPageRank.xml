@@ -10,13 +10,23 @@
 			<name>Test</name>
 		</operator>
 		<operator>
-			<key>PageRank_Key</key>
-			<name>Page Rank</name>
+			<key>PageRank_Hadoop_Key</key>
+			<name>Page Rank on Hadoop</name>
 		</operator>
+		<operator>
+			<key>PageRank_MongoDB_Key</key>
+			<name>Page Rank on MongoDB</name>
+		</operator>
+		<operator>
+			<key>PageRank_MongoDBCollection_Key</key>
+			<name>Read Collection MongoDB</name>
+		</operator>
+		
 		<operator>
 			<key>PageRank_File_Key</key>
 			<name>Page Rank File</name>
 		</operator>
+		
 	</group>
 
 

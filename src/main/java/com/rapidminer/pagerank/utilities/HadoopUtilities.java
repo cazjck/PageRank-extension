@@ -9,9 +9,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
-import java.util.logging.Level;
 
-import javax.swing.text.StyledEditorKit.BoldAction;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -22,7 +20,6 @@ import com.rapidminer.example.Attributes;
 import com.rapidminer.example.Example;
 import com.rapidminer.example.ExampleSet;
 import com.rapidminer.tools.FileSystemService;
-import com.rapidminer.tools.LogService;
 
 /**
  * 
@@ -203,7 +200,6 @@ public class HadoopUtilities {
 		// wait for the task complete
 		p.waitFor();
 
-		int ret = p.exitValue();
 		return null;
 
 	}

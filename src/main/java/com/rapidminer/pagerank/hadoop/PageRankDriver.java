@@ -13,11 +13,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
-import org.apache.hadoop.metrics2.lib.MutableMetric;
-import org.apache.hadoop.metrics2.lib.MutableMetricsFactory;
 import org.apache.hadoop.util.Tool;
-import org.apache.hadoop.util.ToolRunner;
-import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.log4j.PropertyConfigurator;
 
 import com.rapidminer.pagerank.utilities.HadoopCluster;

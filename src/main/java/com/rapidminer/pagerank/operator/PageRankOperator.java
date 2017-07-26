@@ -18,7 +18,7 @@ import com.rapidminer.operator.ports.metadata.MetaData;
 import com.rapidminer.operator.ports.metadata.SetRelation;
 import com.rapidminer.operator.ports.metadata.SimplePrecondition;
 import com.rapidminer.pagerank.hadoop.PageRankDriver;
-import com.rapidminer.pagerank.mongodb.PageRankMongoDB;
+import com.rapidminer.pagerank.mongodb.MongoDBPageRank;
 import com.rapidminer.parameter.ParameterType;
 import com.rapidminer.parameter.ParameterTypeDouble;
 import com.rapidminer.parameter.ParameterTypeInt;
@@ -68,10 +68,12 @@ public class PageRankOperator extends Operator {
 		ExampleSet exampleSetResult = null;
 		try {
 			// Save Example Set to MongoDB
-			if (!PageRankMongoDB.saveCollection(exampleSet)) {
+			if (!MongoDBPageRank.saveCollection(exampleSet)) {
 				throw new UserError(this, "301", "error save file");
 			}
-			/*if (PARAMETER_CLUSTER) {
+			// Using on Hadoop
+			/*HadoopUtilities.saveExampleSetToFile(exampleSet);
+			if (PARAMETER_CLUSTER) {
 				if (!HadoopUtilities.writeHadoopCluster(PageRankDriver.INPUT_LOCAL, PageRankDriver.INPUT_CLUSTER)) {
 					throw new UserError(this, "301", "Update file to HDFS failed");
 				}
@@ -94,11 +96,12 @@ public class PageRankOperator extends Operator {
 					throw new UserError(this, "301", "Run Hadoop Failed:"+PageRankDriver.RESULT_LOCAL);
 				}
 			}*/
+			
 			MapReduceOutput result;
-			if ((result = PageRankMongoDB.runPageRank(interaions,damping)) == null) {
+			if ((result = MongoDBPageRank.runPageRank(interaions,damping)) == null) {
 				throw new UserError(this, "301", "Page Rank - Map Reduce on MongoDB failed");
 			}
-			exampleSetResult=PageRankMongoDB.getDataPageRank(result);
+			exampleSetResult=MongoDBPageRank.getDataPageRank(result);
 			
 
 		} catch (Exception e) {
@@ -110,6 +113,7 @@ public class PageRankOperator extends Operator {
 		output.deliver(exampleSetResult);
 	}
 
+	
 	@Override
 	public List<ParameterType> getParameterTypes() {
 		List<ParameterType> types = super.getParameterTypes();
