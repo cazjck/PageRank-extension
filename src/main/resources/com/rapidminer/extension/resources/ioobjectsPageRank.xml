@@ -9,4 +9,10 @@
 	  <renderer>com.rapidminer.extension.ioobjects.renderer.ExampleIOObjectRenderer</renderer>
 	</ioobject>
     -->
+	<ioobject
+		name="Document"
+		class="com.rapidminer.pagerank.mongodb.document.Document"
+		reportable="true">
+	  <renderer>com.rapidminer.pagerank.mongodb.document.DocumentRenderer</renderer>
+	</ioobject>
 </ioobjects>

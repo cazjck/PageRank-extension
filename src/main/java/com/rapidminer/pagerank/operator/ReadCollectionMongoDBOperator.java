@@ -1,8 +1,12 @@
-package com.rapidminer.pagerank.mongodb;
+package com.rapidminer.pagerank.operator;
 
-import com.rapidminer.operator.text.*;
+
+import com.rapidminer.pagerank.mongodb.MongoDBConnector;
+import com.rapidminer.pagerank.mongodb.MongoDBUtils;
 import com.rapidminer.pagerank.mongodb.config.CollectionProvider;
+import com.rapidminer.pagerank.mongodb.document.Document;
 import com.rapidminer.operator.ports.metadata.*;
+
 import java.util.*;
 
 import com.mongodb.MongoClient;
@@ -10,12 +14,10 @@ import com.mongodb.client.*;
 import com.rapidminer.operator.*;
 import com.rapidminer.tools.*;
 import com.rapidminer.operator.ports.*;
+import com.rapidminer.parameter.conditions.*;
 import com.rapidminer.parameter.*;
-import com.rapidminer.parameter.conditions.BooleanParameterCondition;
-import com.rapidminer.parameter.conditions.ParameterCondition;
-import com.rapidminer.parameter.conditions.PortConnectedCondition;
 
-public class ReadCollectionMongoDB extends MongoDBConnector {
+public class ReadCollectionMongoDBOperator extends MongoDBConnector {
 
 	public static final String CRITERIA_INPUT_PORT_NAME = "criteria";
 	private final InputPort criteriaInput;
@@ -34,16 +36,15 @@ public class ReadCollectionMongoDB extends MongoDBConnector {
 	public static final String PARAMETER_MONGODB_LIMIT_FLAG = "limit_results";
 	public static final String PARAMETER_MONGODB_LIMIT = "limit";
 
-	public ReadCollectionMongoDB(OperatorDescription description) {
+	public ReadCollectionMongoDBOperator(OperatorDescription description) {
 		super(description);
 		this.criteriaInput = (InputPort) this.getInputPorts().createPort("criteria");
 		this.projectionInput = (InputPort) this.getInputPorts().createPort("projection");
 		this.sortingInput = (InputPort) this.getInputPorts().createPort("sorting criteria");
 		this.collectionOutput = (OutputPort) this.getOutputPorts().createPort("collection");
-		this.getTransformer().addRule((MDTransformationRule) new GenerateNewMDRule(this.collectionOutput,
-				(MetaData) new CollectionMetaData(new MetaData((Class) Document.class))));
+		this.getTransformer().addRule((MDTransformationRule)new GenerateNewMDRule(this.collectionOutput, (MetaData)new CollectionMetaData(new MetaData(Document.class))));
 		for (final InputPort port : new InputPort[] { this.criteriaInput, this.projectionInput, this.sortingInput }) {
-			final SimplePrecondition precondition = new SimplePrecondition(port, new MetaData((Class) Document.class)) {
+			final SimplePrecondition precondition = new SimplePrecondition(port, new MetaData(Document.class)) {
 				protected boolean isMandatory() {
 					return false;
 				}
@@ -74,7 +75,7 @@ public class ReadCollectionMongoDB extends MongoDBConnector {
 			org.bson.Document criteria;
 			if (this.criteriaInput.isConnected()) {
 				
-				final Document criteriaDocument = (Document) this.criteriaInput.getData((Class) Document.class);
+				final Document criteriaDocument = (Document) this.criteriaInput.getData(Document.class);
 				criteria = MongoDBUtils.parseToBsonDocument(criteriaDocument.getTokenText());
 			} else {
 				String criteriaString = this.getParameterAsString("criteria");
@@ -85,7 +86,7 @@ public class ReadCollectionMongoDB extends MongoDBConnector {
 			}
 			org.bson.Document projection = null;
 			if (this.projectionInput.isConnected()) {
-				final Document projectionDocument = (Document) this.projectionInput.getData((Class) Document.class);
+				final Document projectionDocument = (Document) this.projectionInput.getData(Document.class);
 				projection = MongoDBUtils.parseToBsonDocument(projectionDocument.getTokenText());
 			} else {
 				final String projectionString = this.getParameterAsString("projection");
@@ -100,7 +101,7 @@ public class ReadCollectionMongoDB extends MongoDBConnector {
 			}
 			String sortingCriteriaString = null;
 			if (this.sortingInput.isConnected()) {
-				final Document sortingCriteriaDocument = (Document) this.sortingInput.getData((Class) Document.class);
+				final Document sortingCriteriaDocument = (Document) this.sortingInput.getData(Document.class);
 				sortingCriteriaString = sortingCriteriaDocument.getTokenText();
 			} else if (this.getParameterAsBoolean("sort_documents")) {
 				final String sortingParameter = this.getParameterAsString("sorting_criteria");
@@ -130,7 +131,7 @@ public class ReadCollectionMongoDB extends MongoDBConnector {
 				this.checkForStop();
 				documents.add(new Document(mongoCursor.next().toJson()));
 			}
-			this.collectionOutput.deliver((IOObject) new IOObjectCollection((List) documents));
+			this.collectionOutput.deliver(((IOObject)new IOObjectCollection((List)documents)));
 		} finally {
 			if (cursor != null) {
 				cursor.iterator().close();
@@ -149,7 +150,7 @@ public class ReadCollectionMongoDB extends MongoDBConnector {
         type.setOptional(true);
         ParameterCondition condition = (ParameterCondition)new PortConnectedCondition((ParameterHandler)this, (PortProvider)new PortProvider() {
             public Port getPort() {
-                return (Port)ReadCollectionMongoDB.this.criteriaInput;
+                return (Port)ReadCollectionMongoDBOperator.this.criteriaInput;
             }
         }, false, false);
         type.registerDependencyCondition(condition);
@@ -159,7 +160,7 @@ public class ReadCollectionMongoDB extends MongoDBConnector {
         type.setOptional(true);
         condition = (ParameterCondition)new PortConnectedCondition((ParameterHandler)this, (PortProvider)new PortProvider() {
             public Port getPort() {
-                return (Port)ReadCollectionMongoDB.this.projectionInput;
+                return (Port)ReadCollectionMongoDBOperator.this.projectionInput;
             }
         }, false, false);
         type.registerDependencyCondition(condition);
@@ -167,7 +168,7 @@ public class ReadCollectionMongoDB extends MongoDBConnector {
         type = (ParameterType)new ParameterTypeBoolean("sort_documents", I18N.getGUIMessage("operator.parameter.mongodb_sorting_flag.description", new Object[0]), false);
         condition = (ParameterCondition)new PortConnectedCondition((ParameterHandler)this, (PortProvider)new PortProvider() {
             public Port getPort() {
-                return (Port)ReadCollectionMongoDB.this.sortingInput;
+                return (Port)ReadCollectionMongoDBOperator.this.sortingInput;
             }
         }, true, false);
         type.registerDependencyCondition(condition);

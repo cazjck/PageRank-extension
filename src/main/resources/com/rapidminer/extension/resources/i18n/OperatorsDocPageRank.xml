@@ -2,31 +2,34 @@
 <operatorHelp lang="en_EN">
 	<!-- This is an example how to specify the translation of operator keys 
 		to names. -->
-	<group key="PageRank">
-		<key>PageRank_Group</key>
+	<group>
+		<key>page_rank</key>
 		<name>Page Rank Group</name>
 		<operator>
-			<key>MyOperator_Key</key>
+			<key>my_operator</key>
 			<name>Test</name>
 		</operator>
 		<operator>
-			<key>PageRank_Hadoop_Key</key>
+			<key>pagerank_hadoop</key>
 			<name>Page Rank on Hadoop</name>
 		</operator>
 		<operator>
-			<key>PageRank_MongoDB_Key</key>
+			<key>pagerank_mongodb</key>
 			<name>Page Rank on MongoDB</name>
 		</operator>
 		<operator>
-			<key>PageRank_MongoDBCollection_Key</key>
+			<key>pagerank_mongodb_read</key>
 			<name>Read Collection MongoDB</name>
-		</operator>
+		</operator>	
+		<operator>
+			<key>pagerank_jsontodata</key>
+			<name>JSON to Example Set</name>
+		</operator>	
 		
 		<operator>
-			<key>PageRank_File_Key</key>
+			<key>pagerank_file</key>
 			<name>Page Rank File</name>
-		</operator>
-		
+		</operator>		
 	</group>
 
 

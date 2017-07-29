@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<operators name="pagerank" version="6.0" docbundle="com/rapidminer/extension/resources/i18n/OperatorsDocPageRank">
-    <group key="">
-        <!-- This is an example how to specify Operators and Operator groups. The Operator groups define
-                where Operators will be located in the Operator tree. -->
-       
-        <group key="PageRank_Group">
+<operators name="pdk" version="6.0" docbundle="com/rapidminer/extension/resources/i18n/OperatorsDocPageRank">
+     
+        <group key="page_rank">
            <operator>
-              <key>MyOperator_Key</key>
+              <key>my_operator</key>
               <class>com.rapidminer.pagerank.operator.MyOperator</class>
               <icon>add.png</icon>          
            </operator>
            <operator>
-              <key>PageRank_Hadoop_Key</key>
-              <class>com.rapidminer.pagerank.operator.PageRankOperator</class>
+              <key>pagerank_hadoop</key>
+              <class>com.rapidminer.pagerank.operator.PageRankHadoopOperator</class>
               <icon>pageRank.png</icon>          
            </operator>
            <operator>
-              <key>PageRank_MongoDB_Key</key>
-              <class>com.rapidminer.pagerank.operator.PageRankExampleSetOperator</class>
+              <key>pagerank_mongodb</key>
+              <class>com.rapidminer.pagerank.operator.PageRankMongoDBOperator</class>
               <icon>pageRank.png</icon>          
            </operator>
            <operator>
-              <key>PageRank_MongoDBCollection_Key</key>
-              <class>com.rapidminer.pagerank.mongodb.ReadCollectionMongoDB</class>
+              <key>pagerank_mongodb_read</key>
+              <class>com.rapidminer.pagerank.operator.ReadCollectionMongoDBOperator</class>
               <icon>pageRank.png</icon>          
            </operator>
+            <operator>
+              <key>pagerank_jsontodata</key>
+              <class>com.rapidminer.pagerank.operator.JSONDocumentsToDataOperator</class>
+              <icon>pageRank.png</icon>          
+           </operator>  
            
-           
+                               
            <operator>
-              <key>PageRank_File_Key</key>
+              <key>pagerank_file</key>
               <class>com.rapidminer.pagerank.file.LoadFilePageRankOperator</class>
               <icon>add.png</icon>          
            </operator>
          </group>
-      
-    </group>
 </operators>

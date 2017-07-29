@@ -101,6 +101,7 @@ public class MongoDBConfigurable extends AbstractConfigurable {
 		MongoDBUtils.testConnection(mongoDB);
 		return mongoDB;
 	}
+	
 
 	public TestConfigurableAction getTestAction() {
 		return new TestConfigurableAction() {

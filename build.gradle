@@ -20,7 +20,7 @@ repositories {
 extensionConfig {
 
     // The extension name
-    name 'Page Rank Extension'
+    name 'PageRank'
 
     /*
      * The artifact group which will be used when publishing the extensions Jar

@@ -7,6 +7,7 @@ import com.mongodb.client.*;
 import java.util.*;
 import org.bson.*;
 import org.bson.json.*;
+
 import com.rapidminer.tools.*;
 import com.rapidminer.tools.config.*;
 import com.mongodb.*;
@@ -96,6 +97,7 @@ public final class MongoDBUtils
             throw new ConfigurationException(I18N.getErrorMessage("error.mongo.wrong_settings", new Object[0]), (Throwable)e);
         }
     }
+
     
     static {
         JSON_OBJECT_PATTERN = Pattern.compile("\\s*(\\{.*\\})\\s*$");

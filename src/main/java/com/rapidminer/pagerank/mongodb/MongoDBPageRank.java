@@ -1,7 +1,13 @@
 package com.rapidminer.pagerank.mongodb;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -10,10 +16,19 @@ import com.mongodb.DBObject;
 import com.mongodb.MapReduceCommand;
 import com.mongodb.MapReduceCommand.OutputType;
 import com.mongodb.MapReduceOutput;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.MapReduceAction;
 import com.rapidminer.example.Example;
 import com.rapidminer.example.ExampleSet;
 import com.rapidminer.example.ExampleSetFactory;
+import com.rapidminer.operator.Operator;
+import com.rapidminer.operator.UserError;
 import com.rapidminer.pagerank.hadoop.utilities.MaxtriHelper;
+import com.rapidminer.pagerank.mongodb.config.MongoDBConfigurable;
+import com.rapidminer.pagerank.operator.PageRankMongoDBOperator;
+import com.rapidminer.tools.config.ConfigurationException;
 
 public class MongoDBPageRank {
 	private static final String DATABASE_PAGERANK = "pagerank";
@@ -29,12 +44,51 @@ public class MongoDBPageRank {
 		 * reduce).collectionName("pages").action(MapReduceAction.REPLACE).
 		 * nonAtomic(false) .sharded(false);
 		 */
-		//runPageRank(10, 0.85);
+		// runPageRank(10, 0.85);
 		// ExampleSet ExampleSet = getDataPageRank(runPageRank(1));
 		// saveCollection(ExampleSet);
 	}
 
-	public static MapReduceOutput runMapReduce(DBCollection collection, Double damping) {
+	public static MapReduceOutput runMapReduce(MongoCollection<Document> collection, Double damping) {
+		HashMap<String, Object> scope = new HashMap<>();
+		scope.put("DAMPING", damping);
+		String map = "function () {" + " 	if(this.value.OutLinks != null){					\n"
+				+ " 		for (var i = 0, len = this.value.OutLinks.length; i < len; i++) {	\n"
+				+ " 			emit(this.value.OutLinks[i], this.value.PageRank / len); 		\n"
+				+ " 		}																	\n"
+				+ " 	}																		\n"
+				+ " 	if( this.value.URL != null){											\n"
+				+ " 		emit(this.value.URL, 0);											\n"
+				+ " 		emit(this.value.URL, this.value.OutLinks);							\n"
+				+ "		}																		\n"
+				+ " }; 																	";
+		String reduce = "function (k, vals) {											\n"
+				+ "	var links = [];														\n"
+				+ "	var pagerank = 0.0;													\n"
+				+ " 	for (var i = 0, len = vals.length; i < len; i++) {				\n"
+				+ " 		if (vals[i] instanceof Array)								\n"
+				+ "  			links = vals[i];										\n"
+				+ "  		else														\n"
+				+ " 			pagerank += vals[i];									\n"
+				+ "  	}																\n"
+				+ "	pagerank = 1 - DAMPING + DAMPING * pagerank;						\n"
+				+ " 	return { URL: k, PageRank: pagerank, OutLinks: links };			\n"
+				+ "};																	";
+		/*MapReduceCommand mapReduceCommand = new MapReduceCommand(collection, map, reduce, COLLECTION_PAGERANK,
+				OutputType.REPLACE, null);*/
+	//	mapReduceCommand.setScope(scope);
+		//MapReduceOutput out = collection.mapReduce(mapReduceCommand);
+
+		collection.mapReduce(map, reduce)
+		.collectionName(COLLECTION_PAGERANK)
+		.action(MapReduceAction.REPLACE)
+		.scope((Bson) scope);
+	//	System.out.println("Duration:" + out.getDuration());
+
+		return null;
+	}
+	
+	public static MapReduceOutput runMapReduceOld(DBCollection collection, Double damping) {
 		HashMap<String, Object> scope = new HashMap<>();
 		scope.put("DAMPING", damping);
 		String map = "function () {" + " 	if(this.value.OutLinks != null){					\n"
@@ -61,7 +115,7 @@ public class MongoDBPageRank {
 				+ "};																	";
 		MapReduceCommand mapReduceCommand = new MapReduceCommand(collection, map, reduce, COLLECTION_PAGERANK,
 				OutputType.REPLACE, null);
-		 mapReduceCommand.setScope(scope);
+		mapReduceCommand.setScope(scope);
 		MapReduceOutput out = collection.mapReduce(mapReduceCommand);
 
 		System.out.println("Duration:" + out.getDuration());
@@ -109,43 +163,113 @@ public class MongoDBPageRank {
 		return exampleSetResult;
 	}
 
-	public static MapReduceOutput runPageRank(int iteration, Double damping) {
-		@SuppressWarnings("deprecation")
-		DB data = MongoConfig.getInstance().getDB(DATABASE_PAGERANK);
-		DBCollection page = data.getCollection(COLLECTION_PAGERANK);
+	public static MapReduceOutput runPageRank(int iteration, Double damping, MongoDBConfigurable config) {
 		MapReduceOutput out = null;
-		for (int i = 1; i <= iteration; i++) {
-			out = runMapReduce(page, damping);
-			if (out.results() != null) {
-				System.out.println("Interation times:" + i);
+		try {
+			//using for test in local
+			//DB db=MongoConfig.getInstance().getDB(DATABASE_PAGERANK);
+			MongoDatabase db = config.getConnection();
+			MongoCollection<Document> collection = db.getCollection(COLLECTION_PAGERANK);
+
+			for (int i = 1; i <= iteration; i++) {
+				out = runMapReduce(collection, damping);
+				if (out.results() != null) {
+					System.out.println("Interation times:" + i);
+				}
 			}
+
+		} catch (ConfigurationException e) {
+			e.printStackTrace();
 		}
 		return out;
 	}
 
-	public static boolean saveCollection(ExampleSet exampleSet) {
+	public static boolean saveCollection(ExampleSet exampleSet, MongoDBConfigurable config) {
 		try {
-			@SuppressWarnings("deprecation")
-			DB db = MongoConfig.getInstance().getDB("pagerank");
+			//using for test in local
+			//DB db=MongoConfig.getInstance().getDB(DATABASE_PAGERANK);
+			MongoDatabase db =  config.getConnection();
+			if (db.getCollection(COLLECTION_PAGERANK) != null) {
+				db.getCollection(COLLECTION_PAGERANK).drop();
+			}
+			 db.createCollection(COLLECTION_PAGERANK);
+			 MongoCollection<Document> collection=db.getCollection(COLLECTION_PAGERANK);
+			List<Document> documents = new LinkedList<>();
+			for (Example item : exampleSet) {
+				documents.add(createDocumentOperater(item));
+			}
+			// System.out.println(documents.toString());
+			collection.insertMany(documents);
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public static Document createDocumentOperater(Example item) {
+		Document newDoc = new Document();
+		String outlink = item.get(OUTLINKS).toString().trim();
+		String[] links = null;
+		List<String> lstLinks=null;
+		// is empty
+		if (!outlink.equals("?")) {
+			links = outlink.split(",");
+			lstLinks=Arrays.asList(links);
+		}
+		
+		newDoc.append("value",
+				new Document(URL, item.get(URL).toString()).append(PAGERANK, 1.0).append(OUTLINKS, lstLinks));
+		return newDoc;
+	}
+	public static MapReduceOutput runPageRankOld(int iteration, Double damping, MongoDBConfigurable config) {
+		MapReduceOutput out = null;
+		try {
+			//using for test in local
+			//DB db=MongoConfig.getInstance().getDB(DATABASE_PAGERANK);
+			 MongoClient mongoClient=config.getInstance();
+			 @SuppressWarnings("deprecation")
+			DB db=mongoClient.getDB(config.getConnection().getName());
+			DBCollection page = db.getCollection(COLLECTION_PAGERANK);
+
+			for (int i = 1; i <= iteration; i++) {
+				out = runMapReduceOld(page, damping);
+				if (out.results() != null) {
+					System.out.println("Interation times:" + i);
+				}
+			}
+
+		} catch (ConfigurationException e) {
+			e.printStackTrace();
+		}
+		return out;
+	}
+	
+	public static boolean saveCollectionOld(ExampleSet exampleSet, MongoDBConfigurable config) {
+		try {
+			//using for test in local
+			//DB db=MongoConfig.getInstance().getDB(DATABASE_PAGERANK);
+			 MongoClient mongoClient=config.getInstance();
+			 @SuppressWarnings("deprecation")
+			DB db=mongoClient.getDB(config.getConnection().getName());
 			if (db.getCollection(COLLECTION_PAGERANK) != null) {
 				db.getCollection(COLLECTION_PAGERANK).drop();
 			}
 			DBCollection collection = db.createCollection(COLLECTION_PAGERANK, null);
 			ArrayList<DBObject> documents = new ArrayList<>();
 			for (Example item : exampleSet) {
-				documents.add(createDocumentOperater(item));
+				documents.add(createDocumentOperaterOld(item));
 			}
 			// System.out.println(documents.toString());
 			collection.insert(documents);
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println(e.getMessage());
 			return false;
 		}
 	}
 
-	public static BasicDBObject createDocumentOperater(Example item) {
+	public static BasicDBObject createDocumentOperaterOld(Example item) {
 		BasicDBObject newDoc = new BasicDBObject();
 		String outlink = item.get(OUTLINKS).toString().trim();
 		String[] links = null;
