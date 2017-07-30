@@ -46,7 +46,7 @@ public class ReadCollectionMongoDBOperator extends MongoDBConnector {
 			//MongoDatabase db=mongoClient.getDatabase(databaseName);
 		//	MongoDatabase db=mon
 			if (!MongoDBUtils.collectionExists(db, collectionName)) {
-				throw new UserError((Operator) this, "nosql.mongodb.collection_does_not_exist",
+				throw new UserError((Operator) this, "pagerank.mongodb.collection_does_not_exist",
 						new Object[] { collectionName });
 			}
 			collection = db.getCollection(collectionName);

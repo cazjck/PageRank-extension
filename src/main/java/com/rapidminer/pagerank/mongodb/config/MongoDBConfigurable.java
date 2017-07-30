@@ -43,7 +43,7 @@ public class MongoDBConfigurable extends AbstractConfigurable {
 		if (mongoDBName == null || mongoDBName.trim().isEmpty()) {
 			throw new ConfigurationException(I18N.getErrorMessage("error.mongo.no_db_name", new Object[0]));
 		}
-		final MongoDatabase mongoDB;
+		MongoDatabase mongoDB=null;
 		synchronized (this) {
 			if (this.mongoClient == null) {
 				String host = this.getParameter("instance_host");
@@ -97,11 +97,14 @@ public class MongoDBConfigurable extends AbstractConfigurable {
 				}
 			}
 			mongoDB = this.mongoClient.getDatabase(mongoDBName);
+			if (mongoDB == null) {
+				throw new ConfigurationException(
+						I18N.getErrorMessage("error.mongo.database_does_not_exist", new Object[0]));
+			}
 		}
 		MongoDBUtils.testConnection(mongoDB);
 		return mongoDB;
 	}
-	
 
 	public TestConfigurableAction getTestAction() {
 		return new TestConfigurableAction() {
