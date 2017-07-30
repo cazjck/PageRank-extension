@@ -269,14 +269,14 @@ public class MongoDBPageRank {
 
 	public static BasicDBObject createDocumentOperaterOld(Example item) {
 		BasicDBObject newDoc = new BasicDBObject();
-		String outlink = item.get(OUTLINKS).toString().trim();
+		String outlink = item.get("outlinks").toString().trim();
 		String[] links = null;
 		// is empty
 		if (!outlink.equals("?")) {
 			links = outlink.split(",");
 		}
 		newDoc.append("value",
-				new BasicDBObject(URL, item.get(URL).toString()).append(PAGERANK, 1.0).append(OUTLINKS, links));
+				new BasicDBObject(URL, item.get("url").toString()).append(PAGERANK, 1.0).append(OUTLINKS, links));
 		return newDoc;
 	}
 

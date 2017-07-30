@@ -42,7 +42,6 @@ public class PageRankMongoDBOperator extends AbstractExampleSetProcessing {
 
 	public static final String PARAMETER_DAMPING = "Damping_factor";
 	public static final String PARAMETER_INTERATION = "Iteration_factor";
-	public static final Boolean PARAMETER_CLUSTER = false;
 
 	public PageRankMongoDBOperator(OperatorDescription description) {
 		super(description);
@@ -52,24 +51,6 @@ public class PageRankMongoDBOperator extends AbstractExampleSetProcessing {
 	protected MetaData modifyMetaData(ExampleSetMetaData metaData) throws UndefinedParameterError {
 		metaData.addAttribute(new AttributeMetaData("PageRank", Ontology.REAL));
 		return super.modifyMetaData(metaData);
-	}
-
-	@Override
-	public List<ParameterType> getParameterTypes() {
-		List<ParameterType> types = super.getParameterTypes();
-		ParameterType type = (ParameterType) new ParameterTypeConfigurable("mongodb_pagerank_instance",
-				I18N.getGUIMessage("operator.parameter.mongodb_pagerank_instance.description", new Object[0]),
-				"mongodb_pagerank_instance");
-		type.setOptional(false);
-		types.add(type);
-		type = new ParameterTypeDouble(PARAMETER_DAMPING,
-				I18N.getGUIMessage("operator.parameter.pagerank_damping_factor.description"), 0.0, 1.0, 0.85);
-		types.add(type);
-		type = new ParameterTypeInt(PARAMETER_INTERATION,
-				I18N.getGUIMessage("operator.parameter.pagerank_iteration_factor.description"), 1,Integer.MAX_VALUE, 2);
-		types.add(type);
-		// type.registerDependencyCondition(new BooleanParameterCondition(this,
-		return types;
 	}
 
 	@Override
@@ -93,16 +74,16 @@ public class PageRankMongoDBOperator extends AbstractExampleSetProcessing {
 
 				// Save Example Set to MongoDB
 				if (!MongoDBPageRank.saveCollectionOld(exampleSet, mongoDBInstanceConfigurable)) {
-					throw new UserError((Operator)this, "301", "error save file");
-				}
-				else {
-					LogService.getRoot().log(Level.CONFIG, "Save Exampleset to Database"+mongoDBInstanceConfigurable.getConnection().getName() +" success");
+					throw new UserError((Operator) this, "301", "error save file");
+				} else {
+					LogService.getRoot().log(Level.CONFIG, "Save Exampleset to Database"
+							+ mongoDBInstanceConfigurable.getConnection().getName() + " success");
 				}
 
 				MapReduceOutput result;
 				if ((result = MongoDBPageRank.runPageRankOld(interaions, damping,
 						mongoDBInstanceConfigurable)) == null) {
-					throw new UserError((Operator)this, "301", "Page Rank - Map Reduce on MongoDB failed");
+					throw new UserError((Operator) this, "301", "Page Rank - Map Reduce on MongoDB failed");
 				}
 				exampleSetResult = MongoDBPageRank.getDataPageRank(result);
 
@@ -122,14 +103,36 @@ public class PageRankMongoDBOperator extends AbstractExampleSetProcessing {
 		return exampleSetResult;
 	}
 
-	private void checkAttribute(ExampleSet exampleSet) throws OperatorException {
-		Attribute URL = exampleSet.getAttributes().get("URL");
-		Attribute OutLinks = exampleSet.getAttributes().get("OutLinks");
+	@Override
+	public List<ParameterType> getParameterTypes() {
+		List<ParameterType> types = super.getParameterTypes();
+		ParameterType type = (ParameterType) new ParameterTypeConfigurable("mongodb_pagerank_instance",
+				I18N.getGUIMessage("operator.parameter.mongodb_pagerank_instance.description", new Object[0]),
+				"mongodb_pagerank_instance");
+		type.setOptional(false);
+		types.add(type);
+		type = new ParameterTypeDouble(PARAMETER_DAMPING,
+				I18N.getGUIMessage("operator.parameter.pagerank_damping_factor.description"), 0.0, 1.0, 0.85);
+		types.add(type);
+		type = new ParameterTypeInt(PARAMETER_INTERATION,
+				I18N.getGUIMessage("operator.parameter.pagerank_iteration_factor.description"), 1, Integer.MAX_VALUE,
+				2);
+		types.add(type);
+		// type.registerDependencyCondition(new BooleanParameterCondition(this,
+		return types;
+	}
+
+	private void checkAttribute(ExampleSet exampleSet) throws OperatorException {	
+		for (Attribute ar : exampleSet.getAttributes()) {
+			ar.setName(ar.getName().toLowerCase());
+		}
+		Attribute URL = exampleSet.getAttributes().get("URL".toLowerCase());
+		Attribute OutLinks = exampleSet.getAttributes().get("OutLinks".toLowerCase());
 		if (URL == null) {
-			throw new AttributeNotFoundError((Operator)this, "URL", "URL");
+			throw new AttributeNotFoundError((Operator) this, "URL", "URL");
 		}
 		if (OutLinks == null) {
-			throw new AttributeNotFoundError((Operator)this, "OutLinks", "OutLinks");
+			throw new AttributeNotFoundError((Operator) this, "OutLinks", "OutLinks");
 		}
 
 	}
