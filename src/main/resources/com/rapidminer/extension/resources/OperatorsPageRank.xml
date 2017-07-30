@@ -23,23 +23,18 @@
 			<key>pagerank_mongodb_read</key>
 			<class>com.rapidminer.pagerank.operator.ReadCollectionMongoDBOperator
 			</class>
-			<icon>pageRank.png</icon>
+			<icon>data.png</icon>
 		</operator>
 		<operator>
 			<key>pagerank_jsontodata</key>
 			<class>com.rapidminer.pagerank.operator.JSONDocumentsToDataOperator
 			</class>
-			<icon>pageRank.png</icon>
+			<icon>text.png</icon>
 		</operator>
 		<operator>
 			<key>pagerank_file</key>
 			<class>com.rapidminer.pagerank.file.LoadFilePageRankOperator</class>
-			<icon>add.png</icon>
-		</operator>
-		<operator>
-			<key>my_operator</key>
-			<class>com.rapidminer.pagerank.operator.MyOperator</class>
-			<icon>add.png</icon>
+			<icon>inbox_into.png</icon>
 		</operator>
 	</group>
 

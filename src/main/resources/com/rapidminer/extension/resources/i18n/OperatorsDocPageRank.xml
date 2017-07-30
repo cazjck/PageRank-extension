@@ -15,8 +15,7 @@
 			<name>Page Rank on MongoDB</name>
 		</operator>
 	</group>
-	<group>
-		<key>mongodb</key>
+	<group key="mongodb">
 		<name>MongoDB</name>
 		<operator>
 			<key>pagerank_mongodb_read</key>
@@ -30,10 +29,6 @@
 		<operator>
 			<key>pagerank_file</key>
 			<name>Page Rank File</name>
-		</operator>
-		<operator>
-			<key>my_operator</key>
-			<name>Test</name>
 		</operator>
 	</group>
 
