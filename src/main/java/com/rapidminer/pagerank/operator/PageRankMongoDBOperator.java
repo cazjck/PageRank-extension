@@ -1,6 +1,7 @@
 package com.rapidminer.pagerank.operator;
 
 import java.util.List;
+import java.util.logging.Level;
 
 import com.mongodb.MapReduceOutput;
 import com.mongodb.MongoException;
@@ -26,6 +27,7 @@ import com.rapidminer.parameter.ParameterTypeInt;
 import com.rapidminer.parameter.UndefinedParameterError;
 import com.rapidminer.repository.RepositoryAccessor;
 import com.rapidminer.tools.I18N;
+import com.rapidminer.tools.LogService;
 import com.rapidminer.tools.Ontology;
 import com.rapidminer.tools.config.ConfigurationException;
 import com.rapidminer.tools.config.ConfigurationManager;
@@ -48,7 +50,7 @@ public class PageRankMongoDBOperator extends AbstractExampleSetProcessing {
 
 	@Override
 	protected MetaData modifyMetaData(ExampleSetMetaData metaData) throws UndefinedParameterError {
-		metaData.addAttribute(new AttributeMetaData("PageRank", Ontology.NUMERICAL));
+		metaData.addAttribute(new AttributeMetaData("PageRank", Ontology.REAL));
 		return super.modifyMetaData(metaData);
 	}
 
@@ -93,6 +95,9 @@ public class PageRankMongoDBOperator extends AbstractExampleSetProcessing {
 				if (!MongoDBPageRank.saveCollectionOld(exampleSet, mongoDBInstanceConfigurable)) {
 					throw new UserError((Operator)this, "301", "error save file");
 				}
+				else {
+					LogService.getRoot().log(Level.CONFIG, "Save Exampleset to Database"+mongoDBInstanceConfigurable.getConnection().getName() +" success");
+				}
 
 				MapReduceOutput result;
 				if ((result = MongoDBPageRank.runPageRankOld(interaions, damping,
@@ -102,9 +107,7 @@ public class PageRankMongoDBOperator extends AbstractExampleSetProcessing {
 				exampleSetResult = MongoDBPageRank.getDataPageRank(result);
 
 			} catch (IllegalArgumentException | JSONParseException ex2) {
-				final RuntimeException ex = null;
-				final RuntimeException e2 = ex;
-				throw new UserError((Operator) this, (Throwable) e2, "pagerank.mongodb.invalid_json_object");
+				throw new UserError((Operator) this, (Throwable) ex2, "pagerank.mongodb.invalid_json_object");
 			} catch (MongoException e3) {
 				throw new UserError((Operator) this, (Throwable) new MongoExceptionWrapper(e3),
 						"pagerank.mongodb.mongo_exception");

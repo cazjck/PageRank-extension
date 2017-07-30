@@ -2,7 +2,11 @@ package com.rapidminer.pagerank.mongodb;
 
 
 import com.mongodb.MongoClient;
-
+/**
+ * 
+ * MongoConfig using for test in localhost
+ *
+ */
 public class MongoConfig {
 	private static MongoClient mongoClient = null;
 	public static String HOST = "localhost";

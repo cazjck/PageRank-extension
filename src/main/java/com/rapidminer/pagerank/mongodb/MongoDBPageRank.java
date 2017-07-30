@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -25,6 +26,7 @@ import com.rapidminer.example.ExampleSet;
 import com.rapidminer.example.ExampleSetFactory;
 import com.rapidminer.pagerank.hadoop.utilities.MaxtriHelper;
 import com.rapidminer.pagerank.mongodb.config.MongoDBConfigurable;
+import com.rapidminer.tools.LogService;
 import com.rapidminer.tools.config.ConfigurationException;
 
 public class MongoDBPageRank {
@@ -214,9 +216,6 @@ public class MongoDBPageRank {
 				OutputType.REPLACE, null);
 		mapReduceCommand.setScope(scope);
 		MapReduceOutput out = collection.mapReduce(mapReduceCommand);
-
-		System.out.println("Duration:" + out.getDuration());
-
 		return out;
 	}
 
@@ -233,7 +232,8 @@ public class MongoDBPageRank {
 			for (int i = 1; i <= iteration; i++) {
 				out = runMapReduceOld(page, damping);
 				if (out.results() != null) {
-					System.out.println("Interation times:" + i);
+					System.out.println("Interation times:" + i +" with Duration:"+out.getDuration()+"ms");
+					LogService.getRoot().log(Level.CONFIG, "Interation times:" + i +" with Duration:"+out.getDuration()+"ms");
 				}
 			}
 
