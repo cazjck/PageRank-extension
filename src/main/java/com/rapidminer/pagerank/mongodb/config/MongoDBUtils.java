@@ -6,7 +6,6 @@ import com.mongodb.client.*;
 import java.util.*;
 import org.bson.*;
 import org.bson.json.*;
-import org.bson.conversions.*;
 import com.rapidminer.tools.*;
 import com.rapidminer.tools.config.*;
 import com.mongodb.*;

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../../../../../rapidminerreferencemanual/documentation2html.xsl"?>
+<p1:documents xmlns:p1="http://rapid-i.com/schemas/documentation/reference/1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://rapid-i.com/schemas/documentation/reference/1.0/documentation.xsd">
+	<operator key="operator.pagerank:pagerank_mongodb_read" locale="en" version="6.0.003">
+		<title>Read Collection MongoDB</title>
+		<synopsis>Reads documents from a MongoDB collection.</synopsis>
+		<text>
+			<paragraph>
+				This operator retrieves a collection of documents from the specified MongoDB collection.				
+			</paragraph>
+		</text>
+		<outputPorts>
+			<port name="collection" type="com.rapidminer.operator.IOObjectCollection">
+				The documents retrieved from the MongoDB collection.
+			</port>
+		</outputPorts>
+		<parameters>
+			<parameter key="mongodb_pagerank_instance" type="configurable">
+				The MongoDB instance to be used for storing the documents.
+			</parameter>
+			<parameter key="collection" type="string">
+				The MongoDB collection in which the documents are stored.
+			</parameter>			
+			<parameter key="limit_results" type="boolean">
+				Whether the number of results should be limited.
+			</parameter>
+			<parameter key="limit" type="integer">
+				The number of documents to be queried.
+			</parameter>
+			<parameter key="skip" type="integer">
+				The number of documents to be skipped.
+			</parameter>
+		</parameters>
+	</operator>
+</p1:documents>

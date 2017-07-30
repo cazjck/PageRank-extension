@@ -29,23 +29,22 @@ public class JSONDocumentsToDataOperator extends Operator
     public static final String PARAMETER_REQUIRE_MIN_EXAMPLES = "minimal_examples_(absolute)";
     public static final String PARAMETER_SKIP_INVALID_DOCUMENT_FLAG = "skip_invalid_documents";
     JsonFactory jsonFactory;
-    private final char FIELD_NAME_SEPARATOR = '.';
     
     public JSONDocumentsToDataOperator(final OperatorDescription description) {
         super(description);
-        this.inputDocumentExtender = new InputPortExtender("documents", (Ports)this.getInputPorts()) {
+        this.inputDocumentExtender = new InputPortExtender("documents", this.getInputPorts()) {
             protected Precondition makePrecondition(final InputPort port) {
-                return (Precondition)new SimplePrecondition(port, new MetaData((Class)Document.class), false);
+                return (Precondition)new SimplePrecondition(port, new MetaData(Document.class), false);
             }
         };
         this.exampleSetOutput = (OutputPort)this.getOutputPorts().createPort("example set");
         this.jsonFactory = new JsonFactory();
         this.inputDocumentExtender.start();
-        this.getTransformer().addGenerationRule(this.exampleSetOutput, (Class)ExampleSet.class);
+        this.getTransformer().addGenerationRule(this.exampleSetOutput, ExampleSet.class);
     }
     
     public void doWork() throws OperatorException {
-        final List<Document> documents = (List<Document>)this.inputDocumentExtender.getData((Class)Document.class, true);
+        final List<Document> documents = (List<Document>)this.inputDocumentExtender.getData(Document.class, true);
         final HashMap<String, Integer> foundFields = new HashMap<String, Integer>();
         final List<Map<String, String>> documentData = new LinkedList<Map<String, String>>();
         for (final Document document : documents) {
@@ -87,7 +86,7 @@ public class JSONDocumentsToDataOperator extends Operator
             this.checkForStop();
             attributeList.add(AttributeFactory.createAttribute(element, 1));
         }
-        final ExampleSetBuilder builder = ExampleSets.from((List)attributeList).withExpectedSize(documentData.size());
+        final ExampleSetBuilder builder = ExampleSets.from(attributeList).withExpectedSize(documentData.size());
         for (final Map<String, String> entry3 : documentData) {
             this.checkForStop();
             final double[] row = new double[sortedKeys.length];
@@ -230,6 +229,8 @@ public class JSONDocumentsToDataOperator extends Operator
                     entries.put(key.toString(), parser.getValueAsString());
                     continue;
                 }
+			default:
+				break;
             }
         }
         return entries;

@@ -5,10 +5,7 @@
 	<group>
 		<key>page_rank</key>
 		<name>Page Rank Group</name>
-		<operator>
-			<key>my_operator</key>
-			<name>Test</name>
-		</operator>
+
 		<operator>
 			<key>pagerank_hadoop</key>
 			<name>Page Rank on Hadoop</name>
@@ -17,19 +14,27 @@
 			<key>pagerank_mongodb</key>
 			<name>Page Rank on MongoDB</name>
 		</operator>
+	</group>
+	<group>
+		<key>mongodb</key>
+		<name>MongoDB</name>
 		<operator>
 			<key>pagerank_mongodb_read</key>
 			<name>Read Collection MongoDB</name>
-		</operator>	
+		</operator>
 		<operator>
 			<key>pagerank_jsontodata</key>
 			<name>JSON to Example Set</name>
-		</operator>	
-		
+		</operator>
+
 		<operator>
 			<key>pagerank_file</key>
 			<name>Page Rank File</name>
-		</operator>		
+		</operator>
+		<operator>
+			<key>my_operator</key>
+			<name>Test</name>
+		</operator>
 	</group>
 
 

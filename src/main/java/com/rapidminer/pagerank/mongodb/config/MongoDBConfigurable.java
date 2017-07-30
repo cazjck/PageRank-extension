@@ -27,7 +27,7 @@ public class MongoDBConfigurable extends AbstractConfigurable {
 	}
 
 	public void configure(final Map<String, String> parameters) {
-		super.configure((Map) parameters);
+		super.configure(parameters);
 		this.closeConnection();
 	}
 

@@ -57,19 +57,17 @@ public class PageRankMongoDBOperator extends AbstractExampleSetProcessing {
 	public List<ParameterType> getParameterTypes() {
 		List<ParameterType> types = super.getParameterTypes();
 		ParameterType type = (ParameterType) new ParameterTypeConfigurable("mongodb_pagerank_instance",
-				I18N.getGUIMessage("operator.parameter.mongodb_instance.description", new Object[0]),
+				I18N.getGUIMessage("operator.parameter.mongodb_pagerank_instance.description", new Object[0]),
 				"mongodb_pagerank_instance");
 		type.setOptional(false);
 		types.add(type);
-		ParameterType damping = new ParameterTypeDouble(PARAMETER_DAMPING, "This parameter defines damping factory.",
-				0.0, 1.0, 0.85);
-		ParameterType interations = new ParameterTypeInt(PARAMETER_INTERATION,
-				"This parameter defines iteration factory.", 1, 100, 2);
+		type = new ParameterTypeDouble(PARAMETER_DAMPING,
+				I18N.getGUIMessage("operator.parameter.pagerank_damping_factor.description"), 0.0, 1.0, 0.85);
+		types.add(type);
+		type = new ParameterTypeInt(PARAMETER_INTERATION,
+				I18N.getGUIMessage("operator.parameter.pagerank_iteration_factor.description"), 1,Integer.MAX_VALUE, 2);
+		types.add(type);
 		// type.registerDependencyCondition(new BooleanParameterCondition(this,
-
-		types.add(damping);
-		types.add(interations);
-
 		return types;
 	}
 
@@ -94,11 +92,12 @@ public class PageRankMongoDBOperator extends AbstractExampleSetProcessing {
 
 				// Save Example Set to MongoDB
 				if (!MongoDBPageRank.saveCollectionOld(exampleSet, mongoDBInstanceConfigurable)) {
-					throw new UserError(this, "301", "error save file");
+					throw new UserError((Operator)this, "301", "error save file");
 				}
 
 				MapReduceOutput result;
-				if ((result = MongoDBPageRank.runPageRankOld(interaions, damping,mongoDBInstanceConfigurable)) == null) {
+				if ((result = MongoDBPageRank.runPageRankOld(interaions, damping,
+						mongoDBInstanceConfigurable)) == null) {
 					throw new UserError(this, "301", "Page Rank - Map Reduce on MongoDB failed");
 				}
 				exampleSetResult = MongoDBPageRank.getDataPageRank(result);

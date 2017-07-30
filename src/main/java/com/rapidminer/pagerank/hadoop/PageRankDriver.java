@@ -137,9 +137,9 @@ public class PageRankDriver extends Configured implements Tool {
 
 		Job job = Job.getInstance(conf, "Rank Calculation");
 		job.setJarByClass(PageRankDriver.class);
-		job.setMapperClass(ProcessPageRankMapper1.class);
+		job.setMapperClass(RankCalculateMapper.class);
 		//job.setJar("D:/PageRankMapReduce.jar");// run in Hadoop cluster
-		job.setReducerClass(ProcessPageRankReducer1.class);
+		job.setReducerClass(RankCalculateReduce.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
 		HadoopUtilities.deleteFolderHadoopCluster(conf, outputPath);

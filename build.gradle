@@ -58,7 +58,7 @@ extensionConfig {
 dependencies {
 	//compile 'com.google.guava:guava:18.0'
 	
-	compile files('C:/Users/cazjc/.RapidMiner/managed/rmx_text-7.5.0.jar')
+	//compile files('C:/Users/cazjc/.RapidMiner/managed/rmx_text-7.5.0.jar')
 	//compile files('C:/Users/cazjc/.RapidMiner/managed/rmx_nosql-7.5.0.jar')
 	//compile files('D:/Program Files/RapidMiner Studio/lib/plugins/rapidminer-extension-professional-7.5.3-all.jar')
 	

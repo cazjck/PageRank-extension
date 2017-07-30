@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
-public class ProcessPageRankReducer1 extends Reducer<Text, Text, Text, Text> {
+public class ProcessPageRankReducer extends Reducer<Text, Text, Text, Text> {
 	@Override
 	protected void reduce(Text page, Iterable<Text> values, Reducer<Text, Text, Text, Text>.Context context)
 			throws IOException, InterruptedException {

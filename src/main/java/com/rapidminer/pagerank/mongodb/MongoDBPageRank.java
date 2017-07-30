@@ -23,15 +23,12 @@ import com.mongodb.client.model.MapReduceAction;
 import com.rapidminer.example.Example;
 import com.rapidminer.example.ExampleSet;
 import com.rapidminer.example.ExampleSetFactory;
-import com.rapidminer.operator.Operator;
-import com.rapidminer.operator.UserError;
 import com.rapidminer.pagerank.hadoop.utilities.MaxtriHelper;
 import com.rapidminer.pagerank.mongodb.config.MongoDBConfigurable;
-import com.rapidminer.pagerank.operator.PageRankMongoDBOperator;
 import com.rapidminer.tools.config.ConfigurationException;
 
 public class MongoDBPageRank {
-	private static final String DATABASE_PAGERANK = "pagerank";
+	// private static final String DATABASE_PAGERANK = "pagerank";
 	private static final String COLLECTION_PAGERANK = "pages";
 	private static final String URL = "URL";
 	private static final String PAGERANK = "PageRank";
@@ -74,53 +71,18 @@ public class MongoDBPageRank {
 				+ "	pagerank = 1 - DAMPING + DAMPING * pagerank;						\n"
 				+ " 	return { URL: k, PageRank: pagerank, OutLinks: links };			\n"
 				+ "};																	";
-		/*MapReduceCommand mapReduceCommand = new MapReduceCommand(collection, map, reduce, COLLECTION_PAGERANK,
-				OutputType.REPLACE, null);*/
-	//	mapReduceCommand.setScope(scope);
-		//MapReduceOutput out = collection.mapReduce(mapReduceCommand);
+		/*
+		 * MapReduceCommand mapReduceCommand = new MapReduceCommand(collection,
+		 * map, reduce, COLLECTION_PAGERANK, OutputType.REPLACE, null);
+		 */
+		// mapReduceCommand.setScope(scope);
+		// MapReduceOutput out = collection.mapReduce(mapReduceCommand);
 
-		collection.mapReduce(map, reduce)
-		.collectionName(COLLECTION_PAGERANK)
-		.action(MapReduceAction.REPLACE)
-		.scope((Bson) scope);
-	//	System.out.println("Duration:" + out.getDuration());
+		collection.mapReduce(map, reduce).collectionName(COLLECTION_PAGERANK).action(MapReduceAction.REPLACE)
+				.scope((Bson) scope);
+		// System.out.println("Duration:" + out.getDuration());
 
 		return null;
-	}
-	
-	public static MapReduceOutput runMapReduceOld(DBCollection collection, Double damping) {
-		HashMap<String, Object> scope = new HashMap<>();
-		scope.put("DAMPING", damping);
-		String map = "function () {" + " 	if(this.value.OutLinks != null){					\n"
-				+ " 		for (var i = 0, len = this.value.OutLinks.length; i < len; i++) {	\n"
-				+ " 			emit(this.value.OutLinks[i], this.value.PageRank / len); 		\n"
-				+ " 		}																	\n"
-				+ " 	}																		\n"
-				+ " 	if( this.value.URL != null){											\n"
-				+ " 		emit(this.value.URL, 0);											\n"
-				+ " 		emit(this.value.URL, this.value.OutLinks);							\n"
-				+ "		}																		\n"
-				+ " }; 																	";
-		String reduce = "function (k, vals) {											\n"
-				+ "	var links = [];														\n"
-				+ "	var pagerank = 0.0;													\n"
-				+ " 	for (var i = 0, len = vals.length; i < len; i++) {				\n"
-				+ " 		if (vals[i] instanceof Array)								\n"
-				+ "  			links = vals[i];										\n"
-				+ "  		else														\n"
-				+ " 			pagerank += vals[i];									\n"
-				+ "  	}																\n"
-				+ "	pagerank = 1 - DAMPING + DAMPING * pagerank;						\n"
-				+ " 	return { URL: k, PageRank: pagerank, OutLinks: links };			\n"
-				+ "};																	";
-		MapReduceCommand mapReduceCommand = new MapReduceCommand(collection, map, reduce, COLLECTION_PAGERANK,
-				OutputType.REPLACE, null);
-		mapReduceCommand.setScope(scope);
-		MapReduceOutput out = collection.mapReduce(mapReduceCommand);
-
-		System.out.println("Duration:" + out.getDuration());
-
-		return out;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -166,8 +128,8 @@ public class MongoDBPageRank {
 	public static MapReduceOutput runPageRank(int iteration, Double damping, MongoDBConfigurable config) {
 		MapReduceOutput out = null;
 		try {
-			//using for test in local
-			//DB db=MongoConfig.getInstance().getDB(DATABASE_PAGERANK);
+			// using for test in local
+			// DB db=MongoConfig.getInstance().getDB(DATABASE_PAGERANK);
 			MongoDatabase db = config.getConnection();
 			MongoCollection<Document> collection = db.getCollection(COLLECTION_PAGERANK);
 
@@ -186,14 +148,14 @@ public class MongoDBPageRank {
 
 	public static boolean saveCollection(ExampleSet exampleSet, MongoDBConfigurable config) {
 		try {
-			//using for test in local
-			//DB db=MongoConfig.getInstance().getDB(DATABASE_PAGERANK);
-			MongoDatabase db =  config.getConnection();
+			// using for test in local
+			// DB db=MongoConfig.getInstance().getDB(DATABASE_PAGERANK);
+			MongoDatabase db = config.getConnection();
 			if (db.getCollection(COLLECTION_PAGERANK) != null) {
 				db.getCollection(COLLECTION_PAGERANK).drop();
 			}
-			 db.createCollection(COLLECTION_PAGERANK);
-			 MongoCollection<Document> collection=db.getCollection(COLLECTION_PAGERANK);
+			db.createCollection(COLLECTION_PAGERANK);
+			MongoCollection<Document> collection = db.getCollection(COLLECTION_PAGERANK);
 			List<Document> documents = new LinkedList<>();
 			for (Example item : exampleSet) {
 				documents.add(createDocumentOperater(item));
@@ -211,25 +173,61 @@ public class MongoDBPageRank {
 		Document newDoc = new Document();
 		String outlink = item.get(OUTLINKS).toString().trim();
 		String[] links = null;
-		List<String> lstLinks=null;
+		List<String> lstLinks = null;
 		// is empty
 		if (!outlink.equals("?")) {
 			links = outlink.split(",");
-			lstLinks=Arrays.asList(links);
+			lstLinks = Arrays.asList(links);
 		}
-		
+
 		newDoc.append("value",
 				new Document(URL, item.get(URL).toString()).append(PAGERANK, 1.0).append(OUTLINKS, lstLinks));
 		return newDoc;
 	}
+
+	public static MapReduceOutput runMapReduceOld(DBCollection collection, Double damping) {
+		HashMap<String, Object> scope = new HashMap<>();
+		scope.put("DAMPING", damping);
+		String map = "function () {" + " 	if(this.value.OutLinks != null){					\n"
+				+ " 		for (var i = 0, len = this.value.OutLinks.length; i < len; i++) {	\n"
+				+ " 			emit(this.value.OutLinks[i], this.value.PageRank / len); 		\n"
+				+ " 		}																	\n"
+				+ " 	}																		\n"
+				+ " 	if( this.value.URL != null){											\n"
+				+ " 		emit(this.value.URL, 0);											\n"
+				+ " 		emit(this.value.URL, this.value.OutLinks);							\n"
+				+ "		}																		\n"
+				+ " }; 																	";
+		String reduce = "function (k, vals) {											\n"
+				+ "	var links = [];														\n"
+				+ "	var pagerank = 0.0;													\n"
+				+ " 	for (var i = 0, len = vals.length; i < len; i++) {				\n"
+				+ " 		if (vals[i] instanceof Array)								\n"
+				+ "  			links = vals[i];										\n"
+				+ "  		else														\n"
+				+ " 			pagerank += vals[i];									\n"
+				+ "  	}																\n"
+				+ "	pagerank = 1 - DAMPING + DAMPING * pagerank;						\n"
+				+ " 	return { URL: k, PageRank: pagerank, OutLinks: links };			\n"
+				+ "};																	";
+		MapReduceCommand mapReduceCommand = new MapReduceCommand(collection, map, reduce, COLLECTION_PAGERANK,
+				OutputType.REPLACE, null);
+		mapReduceCommand.setScope(scope);
+		MapReduceOutput out = collection.mapReduce(mapReduceCommand);
+
+		System.out.println("Duration:" + out.getDuration());
+
+		return out;
+	}
+
 	public static MapReduceOutput runPageRankOld(int iteration, Double damping, MongoDBConfigurable config) {
 		MapReduceOutput out = null;
 		try {
-			//using for test in local
-			//DB db=MongoConfig.getInstance().getDB(DATABASE_PAGERANK);
-			 MongoClient mongoClient=config.getInstance();
-			 @SuppressWarnings("deprecation")
-			DB db=mongoClient.getDB(config.getConnection().getName());
+			// using for test in local
+			// DB db=MongoConfig.getInstance().getDB(DATABASE_PAGERANK);
+			MongoClient mongoClient = config.getInstance();
+			@SuppressWarnings("deprecation")
+			DB db = mongoClient.getDB(config.getConnection().getName());
 			DBCollection page = db.getCollection(COLLECTION_PAGERANK);
 
 			for (int i = 1; i <= iteration; i++) {
@@ -244,14 +242,14 @@ public class MongoDBPageRank {
 		}
 		return out;
 	}
-	
+
 	public static boolean saveCollectionOld(ExampleSet exampleSet, MongoDBConfigurable config) {
 		try {
-			//using for test in local
-			//DB db=MongoConfig.getInstance().getDB(DATABASE_PAGERANK);
-			 MongoClient mongoClient=config.getInstance();
-			 @SuppressWarnings("deprecation")
-			DB db=mongoClient.getDB(config.getConnection().getName());
+			// using for test in local
+			// DB db=MongoConfig.getInstance().getDB(DATABASE_PAGERANK);
+			MongoClient mongoClient = config.getInstance();
+			@SuppressWarnings("deprecation")
+			DB db = mongoClient.getDB(config.getConnection().getName());
 			if (db.getCollection(COLLECTION_PAGERANK) != null) {
 				db.getCollection(COLLECTION_PAGERANK).drop();
 			}
