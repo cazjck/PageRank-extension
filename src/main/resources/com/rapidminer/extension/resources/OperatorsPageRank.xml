@@ -23,7 +23,7 @@
 			<key>pagerank_mongodb_read</key>
 			<class>com.rapidminer.pagerank.operator.ReadCollectionMongoDBOperator
 			</class>
-			<icon>data.png</icon>
+			<icon>mongodb.png</icon>
 		</operator>
 		<operator>
 			<key>pagerank_jsontodata</key>

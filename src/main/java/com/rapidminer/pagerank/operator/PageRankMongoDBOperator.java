@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.mongodb.MapReduceOutput;
 import com.mongodb.MongoException;
-import com.mongodb.client.MongoDatabase;
 import com.mongodb.util.JSONParseException;
 import com.rapidminer.example.Attribute;
 import com.rapidminer.example.ExampleSet;
@@ -98,7 +97,7 @@ public class PageRankMongoDBOperator extends AbstractExampleSetProcessing {
 				MapReduceOutput result;
 				if ((result = MongoDBPageRank.runPageRankOld(interaions, damping,
 						mongoDBInstanceConfigurable)) == null) {
-					throw new UserError(this, "301", "Page Rank - Map Reduce on MongoDB failed");
+					throw new UserError((Operator)this, "301", "Page Rank - Map Reduce on MongoDB failed");
 				}
 				exampleSetResult = MongoDBPageRank.getDataPageRank(result);
 
@@ -124,10 +123,10 @@ public class PageRankMongoDBOperator extends AbstractExampleSetProcessing {
 		Attribute URL = exampleSet.getAttributes().get("URL");
 		Attribute OutLinks = exampleSet.getAttributes().get("OutLinks");
 		if (URL == null) {
-			throw new AttributeNotFoundError(this, "URL", "URL");
+			throw new AttributeNotFoundError((Operator)this, "URL", "URL");
 		}
 		if (OutLinks == null) {
-			throw new AttributeNotFoundError(this, "OutLinks", "OutLinks");
+			throw new AttributeNotFoundError((Operator)this, "OutLinks", "OutLinks");
 		}
 
 	}
