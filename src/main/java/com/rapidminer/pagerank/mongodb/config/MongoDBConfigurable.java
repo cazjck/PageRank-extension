@@ -1,9 +1,6 @@
 package com.rapidminer.pagerank.mongodb.config;
 
 import com.mongodb.client.*;
-import java.io.*;
-import java.security.*;
-import java.security.cert.*;
 import com.mongodb.*;
 import java.util.*;
 import com.rapidminer.tools.config.*;
@@ -54,28 +51,6 @@ public class MongoDBConfigurable extends AbstractConfigurable {
 				}
 				if (port != null && !port.trim().isEmpty()) {
 					host = host + ":" + port;
-				}
-				final String caFile = this.getParameter("instance_ca_file");
-				final String caFilePassword = this.getParameter("instance_ca_file_password");
-				if (caFile != null && !caFile.isEmpty()) {
-					try {
-						KeyStoreLoader.addKeyStoreToTrustStore(caFile, caFilePassword);
-					} catch (FileNotFoundException e) {
-						throw new ConfigurationException(
-								I18N.getErrorMessage("error.mongo.ca_file_not_found", new Object[0]));
-					} catch (IOException e2) {
-						throw new ConfigurationException(
-								I18N.getErrorMessage("error.mongo.ca_io_error", new Object[0]));
-					} catch (NoSuchAlgorithmException e3) {
-						throw new ConfigurationException(
-								I18N.getErrorMessage("error.mongo.ca_no_md5_or_x509_support", new Object[0]));
-					} catch (CertificateException e4) {
-						throw new ConfigurationException(
-								I18N.getErrorMessage("error.mongo.ca_certificate_exception", new Object[0]));
-					} catch (Exception e5) {
-						throw new ConfigurationException(
-								I18N.getErrorMessage("error.mongo.ca_other_error", new Object[0]));
-					}
 				}
 				final MongoClientOptions mongoClientOptions = MongoClientOptions.builder()
 						.sslEnabled(Boolean.parseBoolean(this.getParameter("instance_ssl"))).sslInvalidHostNameAllowed(

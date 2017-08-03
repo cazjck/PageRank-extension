@@ -1,7 +1,12 @@
 package com.rapidminer.pagerank.mongodb.document;
 
 import java.io.*;
-
+/**
+ * 
+ * @author Text extension of RapidMiner
+ * https://marketplace.rapidminer.com/UpdateServer/faces/product_details.xhtml?productId=rmx_text
+ *
+ */
 public final class Token implements Serializable
 {
     private static final long serialVersionUID = 1L;

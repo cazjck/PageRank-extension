@@ -46,7 +46,7 @@ public final class PluginInitPageRank {
 		 * this is called.
 		 */
 		public static void initPlugin() {
-			
+			// register MongoDBConfigurator
 			 ConfigurationManager.getInstance().register(new MongoDBConfigurator());
 		}
 

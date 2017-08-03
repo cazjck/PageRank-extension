@@ -9,7 +9,12 @@ import java.awt.*;
 import com.rapidminer.gui.tools.*;
 import javax.swing.text.*;
 import javax.swing.*;
-
+/**
+ * 
+ * @author Text extension of RapidMiner
+ * https://marketplace.rapidminer.com/UpdateServer/faces/product_details.xhtml?productId=rmx_text
+ *
+ */
 public class DocumentRenderer extends AbstractRenderer
 {
     public Reportable createReportable(final Object renderable, final IOContainer ioContainer, final int desiredWidth, final int desiredHeight) {

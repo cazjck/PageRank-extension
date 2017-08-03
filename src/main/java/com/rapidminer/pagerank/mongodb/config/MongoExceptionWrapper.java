@@ -19,7 +19,7 @@ public class MongoExceptionWrapper extends Exception
         try {
             final Document messageDocument = MongoDBUtils.parseToBsonDocument(message);
             if (messageDocument.containsKey("err") && messageDocument.containsKey("code")) {
-                message = I18N.getUserErrorMessage("error.nosql.mongodb.mongo_exception_wrapper.description", new Object[] { messageDocument.get("err"), messageDocument.get("code") });
+                message = I18N.getUserErrorMessage("error.pagerank.mongodb.mongo_exception_wrapper.description", new Object[] { messageDocument.get("err"), messageDocument.get("code") });
             }
         }
         catch (IllegalArgumentException ex) {}

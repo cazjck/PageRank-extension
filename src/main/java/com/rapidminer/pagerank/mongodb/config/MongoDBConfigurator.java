@@ -16,8 +16,6 @@ public class MongoDBConfigurator extends AbstractConfigurator<MongoDBConfigurabl
 	public static final String PARAMETER_INSTANCE_PWD = "instance_pwd";
 	public static final String PARAMETER_INSTANCE_SSL = "instance_ssl";
 	public static final String PARAMETER_INSTANCE_ALLOW_INVALID_HOSTNAMES = "instance_allow_invalid_hostnames";
-	public static final String PARAMETER_INSTANCE_CA = "instance_import_ca_file";
-	public static final String PARAMETER_INSTANCE_CA_FILE = "instance_ca_file";
 	public static final String PARAMETER_INSTANCE_CA_FILE_PASSWORD = "instance_ca_file_password";
 
 	public Class<MongoDBConfigurable> getConfigurableClass() {
@@ -37,30 +35,6 @@ public class MongoDBConfigurator extends AbstractConfigurator<MongoDBConfigurabl
 
 		parameterTypes.add((ParameterType) new ParameterTypeBoolean(PARAMETER_INSTANCE_SSL,
 				"Does the MongoDB instance require a SSL connection?", false));
-
-		ParameterTypeBoolean ca = new ParameterTypeBoolean(PARAMETER_INSTANCE_CA,
-				"Does the MongoDB instance require a custom CA file?", false);
-
-		ca.registerDependencyCondition(
-				(ParameterCondition) new BooleanParameterCondition(handler, PARAMETER_INSTANCE_SSL, false, true));
-		parameterTypes.add((ParameterType) ca);
-
-		ParameterTypeFile caFile = new ParameterTypeFile(PARAMETER_INSTANCE_CA_FILE,
-				"Certificate of CA. NOTE: This CA will be trusted everywhere in RapidMiner Studio for the whole session.",
-				"jks", true);
-
-		caFile.registerDependencyCondition(
-				(ParameterCondition) new BooleanParameterCondition(handler, PARAMETER_INSTANCE_CA, true, true));
-		parameterTypes.add((ParameterType) caFile);
-
-		ParameterTypePassword caFilePassword = new ParameterTypePassword(PARAMETER_INSTANCE_CA_FILE_PASSWORD,
-				"Password of CA. NOTE: This CA will be trusted everywhere in RapidMiner Studio for the whole session.");
-		caFilePassword.setExpert(true);
-
-		caFilePassword.registerDependencyCondition(
-				(ParameterCondition) new BooleanParameterCondition(handler, PARAMETER_INSTANCE_CA, false, true));
-		parameterTypes.add((ParameterType) caFilePassword);
-
 		ParameterTypeBoolean allowInvalidHostnames = new ParameterTypeBoolean(
 				PARAMETER_INSTANCE_ALLOW_INVALID_HOSTNAMES,
 				"Allows the server SSL certificate's host name to be different from the host name provided.", false);

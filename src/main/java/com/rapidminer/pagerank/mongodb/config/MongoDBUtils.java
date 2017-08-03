@@ -12,7 +12,7 @@ import com.mongodb.*;
 
 public final class MongoDBUtils
 {
-    private static final Pattern JSON_OBJECT_PATTERN;
+    private static final Pattern JSON_OBJECT_PATTERN=Pattern.compile("\\s*(\\{.*\\})\\s*$");
     
     private MongoDBUtils() {
         throw new InstantiationError("Utility class must not be instantiated.");
@@ -63,9 +63,5 @@ public final class MongoDBUtils
         catch (MongoException e) {
             throw new ConfigurationException(I18N.getErrorMessage("error.mongo.wrong_settings", new Object[0]), (Throwable)e);
         }
-    }
-    
-    static {
-        JSON_OBJECT_PATTERN = Pattern.compile("\\s*(\\{.*\\})\\s*$");
     }
 }

@@ -4,12 +4,12 @@
 
 	<group key="page_rank">
 
-		<operator>
+<!-- 		<operator>
 			<key>pagerank_hadoop</key>
 			<class>com.rapidminer.pagerank.operator.PageRankHadoopOperator
 			</class>
 			<icon>pageRank.png</icon>
-		</operator>
+		</operator> -->
 		<operator>
 			<key>pagerank_mongodb</key>
 			<class>com.rapidminer.pagerank.operator.PageRankMongoDBOperator
@@ -31,11 +31,11 @@
 			</class>
 			<icon>text.png</icon>
 		</operator>
-		<operator>
+<!-- 		<operator>
 			<key>pagerank_file</key>
 			<class>com.rapidminer.pagerank.file.LoadFilePageRankOperator</class>
 			<icon>inbox_into.png</icon>
-		</operator>
+		</operator> -->
 	</group>
 
 </operators>

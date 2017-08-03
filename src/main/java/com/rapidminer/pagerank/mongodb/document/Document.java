@@ -5,7 +5,12 @@ import java.util.*;
 import com.rapidminer.operator.*;
 import java.lang.reflect.*;
 import com.rapidminer.tools.*;
-
+/**
+ * 
+ * @author Text extension of RapidMiner
+ * https://marketplace.rapidminer.com/UpdateServer/faces/product_details.xhtml?productId=rmx_text
+ *
+ */
 public class Document extends ResultObjectAdapter
 {
     private static final long serialVersionUID = 7719788736766297420L;
@@ -111,15 +116,18 @@ public class Document extends ResultObjectAdapter
     }
     
     public void addMetaData(final String metaDataKey, final String value, final int valueType) {
-        this.metaData.put(metaDataKey, (Pair<Object, Integer>)new Pair((Object)value, (Object)valueType));
+    	Pair<Object, Integer> pair=new Pair<Object, Integer>(value, valueType);
+        this.metaData.put(metaDataKey, pair);
     }
     
     public void addMetaData(final String metaDataKey, final double value, final int valueType) {
-        this.metaData.put(metaDataKey, (Pair<Object, Integer>)new Pair((Object)value, (Object)valueType));
+    	Pair<Object, Integer> pair=new Pair<Object, Integer>(value, valueType);
+        this.metaData.put(metaDataKey, pair);
     }
     
     public void addMetaData(final String metaDataKey, final Date value, final int valueType) {
-        this.metaData.put(metaDataKey, (Pair<Object, Integer>)new Pair((Object)value, (Object)valueType));
+    	Pair<Object, Integer> pair=new Pair<Object, Integer>(value, valueType);
+        this.metaData.put(metaDataKey, pair);
     }
     
     public int getMetaDataType(final String key) {

@@ -31,7 +31,6 @@ public class ReadCollectionMongoDBOperator extends MongoDBConnector {
 		this.getTransformer().addRule((MDTransformationRule)new GenerateNewMDRule(this.collectionOutput, (MetaData)new CollectionMetaData(new MetaData(Document.class))));
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public void doOperations(MongoClient mongoClient,MongoDatabase db) throws OperatorException {
 		MongoCollection<org.bson.Document> collection = null;
@@ -65,7 +64,8 @@ public class ReadCollectionMongoDBOperator extends MongoDBConnector {
 				this.checkForStop();
 				documents.add(new Document(mongoCursor.next().toJson()));
 			}
-			this.collectionOutput.deliver(((IOObject)new IOObjectCollection((List)documents)));
+			IOObjectCollection<Document> ioObjectCollection=new IOObjectCollection<>(documents);
+			this.collectionOutput.deliver(ioObjectCollection);
 		} finally {
 			if (cursor != null) {
 				cursor.iterator().close();
