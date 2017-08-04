@@ -51,7 +51,7 @@ public class MongoDBPageRank {
 	public static MapReduceOutput runMapReduce(MongoCollection<Document> collection, Double damping) {
 		HashMap<String, Object> scope = new HashMap<>();
 		scope.put("DAMPING", damping);
-		String map = "function () {" + " 	if(this.value.OutLinks != null){					\n"
+		String map = "function () {" + " 	if(this.value.OutLinks != null && this.value.OutLinks.length >0){\n"
 				+ " 		for (var i = 0, len = this.value.OutLinks.length; i < len; i++) {	\n"
 				+ " 			emit(this.value.OutLinks[i], this.value.PageRank / len); 		\n"
 				+ " 		}																	\n"
@@ -92,20 +92,28 @@ public class MongoDBPageRank {
 		ArrayList<ArrayList<Object>> arrayList = new ArrayList<>();
 		ArrayList<Object> arrayList2 = new ArrayList<>();
 		if (result.results() != null) {
-
+			System.out.println("Result element:" + result.getOutputCollection().count());
 			for (DBObject o : result.results()) {
 				if (o != null) {
 					Object obj = o.get("value");
 					try {
 						if (!(obj instanceof Double)) {
 							DBObject dbObject = (DBObject) obj;
+
 							arrayList2.add(dbObject.get(URL).toString());
 							arrayList2.add(dbObject.get(PAGERANK));
-							arrayList2.add(dbObject.get(OUTLINKS).toString());
+							if (dbObject.get(OUTLINKS) != null) {
+								arrayList2.add(dbObject.get(OUTLINKS).toString());
+							}
+							else {
+							//	arrayList2.add("?");
+								arrayList2.add("URL do not contain in this DataSet");
+							}
+							
 						} else {
 							arrayList2.add(o.get("_id").toString());
 							arrayList2.add(o.get("value"));
-							arrayList2.add("URL not contain in this DataSet");
+							arrayList2.add("URL do not contain in this DataSet");
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -190,7 +198,7 @@ public class MongoDBPageRank {
 	public static MapReduceOutput runMapReduceOld(DBCollection collection, Double damping) {
 		HashMap<String, Object> scope = new HashMap<>();
 		scope.put("DAMPING", damping);
-		String map = "function () {" + " 	if(this.value.OutLinks != null){					\n"
+		String map = "function () {" + " 	if(this.value.OutLinks != null && this.value.OutLinks != '?'){	\n"
 				+ " 		for (var i = 0, len = this.value.OutLinks.length; i < len; i++) {	\n"
 				+ " 			emit(this.value.OutLinks[i], this.value.PageRank / len); 		\n"
 				+ " 		}																	\n"
@@ -201,7 +209,7 @@ public class MongoDBPageRank {
 				+ "		}																		\n"
 				+ " }; 																	";
 		String reduce = "function (k, vals) {											\n"
-				+ "	var links = [];														\n"
+				+ "	var links = null;														\n"
 				+ "	var pagerank = 0.0;													\n"
 				+ " 	for (var i = 0, len = vals.length; i < len; i++) {				\n"
 				+ " 		if (vals[i] instanceof Array)								\n"
@@ -232,8 +240,9 @@ public class MongoDBPageRank {
 			for (int i = 1; i <= iteration; i++) {
 				out = runMapReduceOld(page, damping);
 				if (out.results() != null) {
-					System.out.println("Interation times:" + i +" with Duration:"+out.getDuration()+"ms");
-					LogService.getRoot().log(Level.CONFIG, "Interation times:" + i +" with Duration:"+out.getDuration()+"ms");
+					System.out.println("Interation times:" + i + " with Duration:" + out.getDuration() + "ms");
+					LogService.getRoot().log(Level.CONFIG,
+							"Interation times:" + i + " with Duration:" + out.getDuration() + "ms");
 				}
 			}
 
@@ -258,7 +267,8 @@ public class MongoDBPageRank {
 			for (Example item : exampleSet) {
 				documents.add(createDocumentOperaterOld(item));
 			}
-			// System.out.println(documents.toString());
+			System.out.println("Document count:" + documents.size());
+
 			collection.insert(documents);
 			return true;
 		} catch (Exception e) {
@@ -270,7 +280,7 @@ public class MongoDBPageRank {
 	public static BasicDBObject createDocumentOperaterOld(Example item) {
 		BasicDBObject newDoc = new BasicDBObject();
 		String outlink = item.get("outlinks").toString().trim();
-		String[] links = null;
+		String[] links = {"?"};
 		// is empty
 		if (!outlink.equals("?")) {
 			links = outlink.split(",");
