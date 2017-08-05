@@ -15,9 +15,13 @@ import java.util.*;
 import com.fasterxml.jackson.core.*;
 import com.rapidminer.tools.*;
 import com.rapidminer.parameter.*;
-import com.rapidminer.parameter.conditions.*;
 
-
+/**
+ * 
+ * @author Text extension of RapidMiner
+ * https://marketplace.rapidminer.com/UpdateServer/faces/product_details.xhtml?productId=rmx_text
+ *
+ */
 public class JSONDocumentsToDataOperator extends Operator
 {
     public static final String DOCUMENTS_INPUT_PORT_NAME = "documents";
@@ -25,8 +29,6 @@ public class JSONDocumentsToDataOperator extends Operator
     public static final String EXAMPLESET_OUTPUT_PORT_NAME = "example set";
     public OutputPort exampleSetOutput;
     public static final String PARAMETER_IGNORE_ARRAYS = "ignore_arrays";
-    public static final String PARAMETER_REQUIRE_MIN_EXAMPLES_FLAG = "limit_attributes";
-    public static final String PARAMETER_REQUIRE_MIN_EXAMPLES = "minimal_examples_(absolute)";
     public static final String PARAMETER_SKIP_INVALID_DOCUMENT_FLAG = "skip_invalid_documents";
     JsonFactory jsonFactory;
     
@@ -69,16 +71,6 @@ public class JSONDocumentsToDataOperator extends Operator
             }
         }
         HashMap<String, Integer> filteredDocumentStructure = foundFields;
-        if (this.getParameterAsBoolean("limit_attributes")) {
-            final int requiredMinimum = this.getParameterAsInt("minimal_examples_(absolute)");
-            filteredDocumentStructure = new HashMap<String, Integer>();
-            for (final String entry2 : foundFields.keySet()) {
-                this.checkForStop();
-                if (foundFields.get(entry2) >= requiredMinimum) {
-                    filteredDocumentStructure.put(entry2, foundFields.get(entry2));
-                }
-            }
-        }
         final String[] sortedKeys = filteredDocumentStructure.keySet().toArray(new String[filteredDocumentStructure.keySet().size()]);
         Arrays.sort(sortedKeys);
         final List<Attribute> attributeList = new LinkedList<Attribute>();
@@ -240,12 +232,7 @@ public class JSONDocumentsToDataOperator extends Operator
         final List<ParameterType> parameterTypes = (List<ParameterType>)super.getParameterTypes();
         ParameterType type = (ParameterType)new ParameterTypeBoolean("ignore_arrays", I18N.getMessage(I18N.getGUIBundle(), "operator.parameter.ignore_arrays.description", new Object[0]), false);
         type.setExpert(false);
-        parameterTypes.add(type);
-        parameterTypes.add((ParameterType)new ParameterTypeBoolean("limit_attributes", I18N.getMessage(I18N.getGUIBundle(), "operator.parameter.require_minimum_attributes_flag.description", new Object[0]), false));
-        type = (ParameterType)new ParameterTypeInt("minimal_examples_(absolute)", I18N.getMessage(I18N.getGUIBundle(), "operator.parameter.require_minimum_attributes.description", new Object[0]), 1, Integer.MAX_VALUE);
-        type.registerDependencyCondition((ParameterCondition)new BooleanParameterCondition((ParameterHandler)this, "limit_attributes", true, true));
-        type.setOptional(true);
-        parameterTypes.add(type);
+        parameterTypes.add(type);    
         parameterTypes.add((ParameterType)new ParameterTypeBoolean("skip_invalid_documents", I18N.getMessage(I18N.getGUIBundle(), "operator.parameter.skip_invalid_documents.description", new Object[0]), false, true));
         return parameterTypes;
     }
