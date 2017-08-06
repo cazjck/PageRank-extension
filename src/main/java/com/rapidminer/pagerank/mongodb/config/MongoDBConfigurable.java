@@ -36,15 +36,15 @@ public class MongoDBConfigurable extends AbstractConfigurable {
 	}
 
 	public MongoDatabase getConnection() throws ConfigurationException {
-		final String mongoDBName = this.getParameter("instance_db");
+		String mongoDBName = this.getParameter("instance_db");
 		if (mongoDBName == null || mongoDBName.trim().isEmpty()) {
 			throw new ConfigurationException(I18N.getErrorMessage("error.mongo.no_db_name", new Object[0]));
 		}
-		MongoDatabase mongoDB=null;
+		MongoDatabase mongoDB = null;
 		synchronized (this) {
 			if (this.mongoClient == null) {
 				String host = this.getParameter("instance_host");
-				final String port = this.getParameter("instance_port");
+				String port = this.getParameter("instance_port");
 				if (host == null || host.trim().isEmpty()) {
 					throw new ConfigurationException(
 							I18N.getErrorMessage("error.mongo.no_contact_point_defined", new Object[0]));
@@ -52,21 +52,17 @@ public class MongoDBConfigurable extends AbstractConfigurable {
 				if (port != null && !port.trim().isEmpty()) {
 					host = host + ":" + port;
 				}
-				final MongoClientOptions mongoClientOptions = MongoClientOptions.builder()
-						.sslEnabled(Boolean.parseBoolean(this.getParameter("instance_ssl"))).sslInvalidHostNameAllowed(
-								Boolean.parseBoolean(this.getParameter("instance_allow_invalid_hostnames")))
-						.build();
+				MongoClientOptions mongoClientOptions = MongoClientOptions.builder().build();
 				if (!Boolean.parseBoolean(this.getParameter("instance_auth"))) {
 					this.mongoClient = new MongoClient(host, mongoClientOptions);
 				} else {
-					final String user = this.getParameter("instance_user");
-					final String pwd = this.getParameter("instance_pwd");
+					String user = this.getParameter("instance_user");
+					String pwd = this.getParameter("instance_pwd");
 					if (user == null || user.trim().isEmpty() || pwd == null || pwd.trim().isEmpty()) {
 						throw new ConfigurationException(
 								I18N.getErrorMessage("error.no_auth_data_defined", new Object[0]));
 					}
-					final MongoCredential credential = MongoCredential.createCredential(user, mongoDBName,
-							pwd.toCharArray());
+					MongoCredential credential = MongoCredential.createCredential(user, mongoDBName, pwd.toCharArray());
 					this.mongoClient = new MongoClient(new ServerAddress(host), Arrays.asList(credential),
 							mongoClientOptions);
 				}

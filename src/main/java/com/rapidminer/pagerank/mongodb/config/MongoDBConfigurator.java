@@ -14,9 +14,6 @@ public class MongoDBConfigurator extends AbstractConfigurator<MongoDBConfigurabl
 	public static final String PARAMETER_INSTANCE_AUTH = "instance_auth";
 	public static final String PARAMETER_INSTANCE_USER = "instance_user";
 	public static final String PARAMETER_INSTANCE_PWD = "instance_pwd";
-	public static final String PARAMETER_INSTANCE_SSL = "instance_ssl";
-	public static final String PARAMETER_INSTANCE_ALLOW_INVALID_HOSTNAMES = "instance_allow_invalid_hostnames";
-	public static final String PARAMETER_INSTANCE_CA_FILE_PASSWORD = "instance_ca_file_password";
 
 	public Class<MongoDBConfigurable> getConfigurableClass() {
 		return MongoDBConfigurable.class;
@@ -32,17 +29,6 @@ public class MongoDBConfigurator extends AbstractConfigurator<MongoDBConfigurabl
 
 		parameterTypes
 				.add((ParameterType) new ParameterTypeString(PARAMETER_INSTANCE_DB, "Database to be used.", true));
-
-		parameterTypes.add((ParameterType) new ParameterTypeBoolean(PARAMETER_INSTANCE_SSL,
-				"Does the MongoDB instance require a SSL connection?", false));
-		ParameterTypeBoolean allowInvalidHostnames = new ParameterTypeBoolean(
-				PARAMETER_INSTANCE_ALLOW_INVALID_HOSTNAMES,
-				"Allows the server SSL certificate's host name to be different from the host name provided.", false);
-
-		allowInvalidHostnames.registerDependencyCondition(
-				(ParameterCondition) new BooleanParameterCondition(handler, PARAMETER_INSTANCE_SSL, false, true));
-		parameterTypes.add((ParameterType) allowInvalidHostnames);
-
 		parameterTypes.add((ParameterType) new ParameterTypeBoolean(PARAMETER_INSTANCE_AUTH,
 				"Does the MongoDB instance require authentication?", false));
 
