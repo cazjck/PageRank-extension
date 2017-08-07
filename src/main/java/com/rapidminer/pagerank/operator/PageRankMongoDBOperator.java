@@ -81,8 +81,7 @@ public class PageRankMongoDBOperator extends AbstractExampleSetProcessing {
 				}
 
 				MapReduceOutput result;
-				if ((result = MongoDBPageRank.runPageRankOld(interaions, damping,
-						mongoDBInstanceConfigurable)) == null) {
+				if ((result = MongoDBPageRank.runPageRankOld(interaions, damping,mongoDBInstanceConfigurable)) == null) {
 					throw new UserError((Operator) this, "301", "Page Rank - Map Reduce on MongoDB failed");
 				}
 				exampleSetResult = MongoDBPageRank.getDataPageRank(result);

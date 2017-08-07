@@ -3,34 +3,30 @@
 <p1:documents xmlns:p1="http://rapid-i.com/schemas/documentation/reference/1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://rapid-i.com/schemas/documentation/reference/1.0/documentation.xsd">
-	<operator key="operator.pagerank:pagerank_jsontodata" locale="en" version="6.0.003">
-	
+	<operator key="operator.pagerank:pagerank_jsontodata" locale="en"
+		version="6.0.003">
+
 		<title>Documents to Data</title>
-		
+
 		<synopsis>Generates a data set from documents.</synopsis>
-		
+
 		<text>
 			<paragraph>
-				This operator generates a data set from a collection of documents. For
-				each document in the collection, an example is added to the data set.
-				The text contained in the document is stored in a nominal attribute. If
-				a label or meta data are present associated with the documents, a label
-				attribute or attribute for the meta data are created, respectively.
+				This operator generates a data set from a collection of documents. For each document in the collection, an example is added to the data set.
+				The text contained in the document is stored in a nominal attribute. If a label or meta data are present associated with the documents, a label attribute or attribute for the meta data are created, respectively.
 			</paragraph>
 		</text>
 		<inputPorts>
 			<port name="documents" type="com.rapidminer.operator.IOObjectCollection">The documents port.</port>
 		</inputPorts>
-		
+
 		<outputPorts>
 			<port name="example set" type="com.rapidminer.example.ExampleSet">The example set port.</port>
 		</outputPorts>
-		
+
 		<parameters>
-			<parameter key="text_attribute">The name of the text attribute.</parameter>
-			<parameter key="label_attribute">The name of the label attribute.</parameter>
-			<parameter key="add_meta_information">If checked, available meta information of the text like filename, date is added as attribute.</parameter>
-			<parameter key="datamanagement">Determines, how the data is represented internally.</parameter>
+			<parameter key="ignore_arrays" type="boolean">Ignore arrays in collection.</parameter>
+			<parameter key="skip_invalid_documents" type="boolean">Skip invalid documents and continue.</parameter>
 		</parameters>
 	</operator>
 </p1:documents>

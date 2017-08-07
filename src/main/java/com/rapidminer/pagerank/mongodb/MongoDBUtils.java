@@ -14,29 +14,29 @@ import com.mongodb.*;
 
 public final class MongoDBUtils
 {
-    private static final Pattern JSON_OBJECT_PATTERN;
+    private static final Pattern JSON_OBJECT_PATTERN=Pattern.compile("\\s*(\\{.*\\})\\s*$");
     
     private MongoDBUtils() {
         throw new InstantiationError("Utility class must not be instantiated.");
     }
     
-    public static DBObject readJsonObject(final String document) {
-        final Matcher matcher = MongoDBUtils.JSON_OBJECT_PATTERN.matcher(document);
+    public static DBObject readJsonObject( String document) {
+         Matcher matcher = MongoDBUtils.JSON_OBJECT_PATTERN.matcher(document);
         if (matcher.matches()) {
             return (DBObject)JSON.parse(matcher.group(1));
         }
         throw new IllegalArgumentException("Input string does not represent a JSON object.");
     }
     
-    public static List<String> getCollectionNames(final MongoDatabase mongoDB) {
-        final List<String> collectionNames = new ArrayList<String>();
+    public static List<String> getCollectionNames( MongoDatabase mongoDB) {
+         List<String> collectionNames = new ArrayList<String>();
         for (final String collectionName : mongoDB.listCollectionNames()) {
             collectionNames.add(collectionName);
         }
         return collectionNames;
     }
     
-    public static List<String> getCollectionNames(final MongoClient mongoClient,final String databaseName) {
+    public static List<String> getCollectionNames( MongoClient mongoClient, String databaseName) {
     	if (!databaseExists(mongoClient,databaseName)) {
 			return null;
 		}
@@ -58,7 +58,7 @@ public final class MongoDBUtils
         return databaseNames;
     }
     
-    public static boolean collectionExists(final MongoDatabase mongoDB, final String collectionName) {
+    public static boolean collectionExists( MongoDatabase mongoDB,  String collectionName) {
         for (final String name : getCollectionNames(mongoDB)) {
             if (name.equalsIgnoreCase(collectionName)) {
                 return true;
@@ -67,7 +67,7 @@ public final class MongoDBUtils
         return false;
     }
     
-    public static boolean databaseExists(final MongoClient client,final String mongoDB) {
+    public static boolean databaseExists( MongoClient client, String mongoDB) {
         for (final String name : getDatabases(client)) {
             if (name.equalsIgnoreCase(mongoDB)) {
                 return true;
@@ -76,7 +76,7 @@ public final class MongoDBUtils
         return false;
     }
     
-    public static Document parseToBsonDocument(final String json) {
+    public static Document parseToBsonDocument( String json) {
         final Matcher matcher = MongoDBUtils.JSON_OBJECT_PATTERN.matcher(json);
         if (matcher.matches()) {
             try {
@@ -98,8 +98,4 @@ public final class MongoDBUtils
         }
     }
 
-    
-    static {
-        JSON_OBJECT_PATTERN = Pattern.compile("\\s*(\\{.*\\})\\s*$");
-    }
 }
